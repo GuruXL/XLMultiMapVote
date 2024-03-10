@@ -12,9 +12,11 @@ namespace XLMultiMapVote
 {
     public class XLMultiMapVote : MonoBehaviour
     {
-        public delegate void PlayerAction(NetworkPlayerController player);
+        private delegate void PlayerAction(NetworkPlayerController player);
 
         public Action<int> popUpCallBack;
+
+        private string[] popUpOptions = new string[] { "Accept", "Decline" };
 
         private void Awake()
         {
@@ -59,11 +61,9 @@ namespace XLMultiMapVote
             }
         }
 
-        public void ShowPlayerPopUp(string message)
+        public void ShowPlayerPopUp(string message, bool pauseGame, float time)
         {
-            string[] options = new string[] { "Accept", "Decline" };
-
-            ForEachPlayer(player => player.ShowPopup(message, options, popUpCallBack, true, 10f));
+            ForEachPlayer(player => player.ShowPopup(message, popUpOptions, popUpCallBack, pauseGame, time));
         }
 
         public void StartCountdown(float time)
