@@ -159,6 +159,7 @@
     <Compile Include="RapidGUI\Utilities\WindowInvoker.cs" />
     <Compile Include="XLMultiMapVote\Settings.cs" />
     <Compile Include="XLMultiMapVote\XLMultiTools.cs" />
+    <Compile Include="XLMutliMapVote.Data\PopUpMessage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

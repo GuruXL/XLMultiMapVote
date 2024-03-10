@@ -10,6 +10,7 @@ namespace XLMultiMapVote
     [Serializable]
     public class Settings : UnityModManager.ModSettings, IDrawable
     {
+        public bool allowPopUps = true;
 
         public void OnChange()
         {

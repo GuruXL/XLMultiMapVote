@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityModManagerNet;
 using RapidGUI;
 using ModIO.UI;
+using XLMultiMapVote.Data;
 
 namespace XLMultiMapVote
 {
@@ -32,7 +33,30 @@ namespace XLMultiMapVote
         }
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
+            if (!MultiplayerManager.Instance.InRoom)
+                return;
 
+            GUILayout.BeginVertical("Box"); // Main Box
+
+            GUILayout.BeginHorizontal();
+            RGUI.BeginBackgroundColor(Color.white);
+            settings.allowPopUps = GUILayout.Toggle(settings.allowPopUps, "Allow PopUps", GUILayout.Width(128));
+            RGUI.EndBackgroundColor();
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(6);
+
+            GUILayout.Label("Options");
+            GUILayout.BeginHorizontal();
+            RGUI.BeginBackgroundColor(Color.cyan);
+            if (GUILayout.Button("Show PopUp", RGUIStyle.button, GUILayout.Width(128)))
+            {
+                multiMapVote.ShowPlayerPopUp(PopUpMessage.message, true, 10f);
+            }
+            RGUI.EndBackgroundColor();
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical(); // main Box
         }
 
         private static void OnSaveGUI(UnityModManager.ModEntry modEntry)
