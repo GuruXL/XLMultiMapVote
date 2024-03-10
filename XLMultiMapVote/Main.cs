@@ -39,33 +39,29 @@ namespace XLMultiMapVote
         {
             settings.Save(modEntry);
         }
-        private static bool OnToggle(UnityModManager.ModEntry modEntry, bool value)
+        private static bool OnToggle(UnityModManager.ModEntry modEntry, bool state)
         {
-            bool flag;
-            if (enabled == value)
+            // If the current state is the same as the new state, just return true as nothing needs to change.
+            if (enabled == state) return true;
+
+            // Update the 'enabled' flag to the new state.
+            enabled = state;
+
+            if (enabled)
             {
-                flag = true;
+                harmonyInstance = new Harmony(modEntry.Info.Id);
+                harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
+                ScriptManager = new GameObject("XLMultiMapVote");
+                multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
+                Object.DontDestroyOnLoad(ScriptManager);
             }
             else
             {
-                enabled = value;
-                if (enabled)
-                {
-                    harmonyInstance = new Harmony((modEntry.Info).Id);
-                    harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
-                    ScriptManager = new GameObject("XLMultiMapVote");
-                    multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
-
-                    Object.DontDestroyOnLoad(ScriptManager);
-                }
-                else
-                {
-                    harmonyInstance.UnpatchAll(harmonyInstance.Id);
-                    Object.Destroy(ScriptManager);
-                }
-                flag = true;
+                harmonyInstance.UnpatchAll(harmonyInstance.Id);
+                Object.Destroy(ScriptManager);
             }
-            return flag;
+
+            return true; // return true to indicate the toggle was processed correctly.
         }
         public static bool Unload(UnityModManager.ModEntry modEntry)
         {

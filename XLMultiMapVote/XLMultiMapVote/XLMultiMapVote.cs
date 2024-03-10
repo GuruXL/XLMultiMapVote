@@ -12,9 +12,11 @@ namespace XLMultiMapVote
 {
     public class XLMultiMapVote : MonoBehaviour
     {
-        public delegate void PlayerAction(NetworkPlayerController player);
+        private delegate void PlayerAction(NetworkPlayerController player);
 
         public Action<int> popUpCallBack;
+
+        private string[] popUpOptions = new string[] { "Accept", "Decline" };
 
         private void Awake()
         {
@@ -35,9 +37,10 @@ namespace XLMultiMapVote
         {
            
         }
-        public bool isLobbyMaster()
+
+        public bool IsHost()
         {
-            if (PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient || MultiplayerManager.Instance.IsMasterClient)
             {
                 return true;
             }
@@ -59,11 +62,9 @@ namespace XLMultiMapVote
             }
         }
 
-        public void ShowPlayerPopUp(string message)
+        public void ShowPopUp(string message, bool pauseGame, float time)
         {
-            string[] options = new string[] { "Accept", "Decline" };
-
-            ForEachPlayer(player => player.ShowPopup(message, options, popUpCallBack, true, 10f));
+            ForEachPlayer(player => player.ShowPopup(message, popUpOptions, popUpCallBack, pauseGame, time));
         }
 
         public void StartCountdown(float time)
@@ -71,7 +72,7 @@ namespace XLMultiMapVote
             ForEachPlayer(player => player.ShowCountdown(time));
         }
 
-        public void ShowMessage(bool allPlayers, string message, float time)
+        public void ShowMessage(string message, float time)
         {
             ForEachPlayer(player => player.ShowMessage(message, time));
         }
