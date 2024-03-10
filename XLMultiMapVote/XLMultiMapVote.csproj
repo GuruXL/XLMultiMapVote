@@ -154,9 +154,7 @@
     <Compile Include="RapidGUI\Utilities\WarningLabelNoStyle.cs" />
     <Compile Include="RapidGUI\Utilities\WindowInvoker.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
-    <Compile Include="XLMultiMapVote\XLMultiMapVote.cs" />
+    <Compile Include="XLMultiTools.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

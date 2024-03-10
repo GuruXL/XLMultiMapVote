@@ -39,29 +39,33 @@ namespace XLMultiMapVote
         {
             settings.Save(modEntry);
         }
-        private static bool OnToggle(UnityModManager.ModEntry modEntry, bool state)
+        private static bool OnToggle(UnityModManager.ModEntry modEntry, bool value)
         {
-            // If the current state is the same as the new state, just return true as nothing needs to change.
-            if (enabled == state) return true;
-
-            // Update the 'enabled' flag to the new state.
-            enabled = state;
-
-            if (enabled)
+            bool flag;
+            if (enabled == value)
             {
-                harmonyInstance = new Harmony(modEntry.Info.Id);
-                harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
-                ScriptManager = new GameObject("XLMultiMapVote");
-                multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
-                Object.DontDestroyOnLoad(ScriptManager);
+                flag = true;
             }
             else
             {
-                harmonyInstance.UnpatchAll(harmonyInstance.Id);
-                Object.Destroy(ScriptManager);
-            }
+                enabled = value;
+                if (enabled)
+                {
+                    harmonyInstance = new Harmony((modEntry.Info).Id);
+                    harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
+                    ScriptManager = new GameObject("XLMultiMapVote");
+                    multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
 
-            return true; // return true to indicate the toggle was processed correctly.
+                    Object.DontDestroyOnLoad(ScriptManager);
+                }
+                else
+                {
+                    harmonyInstance.UnpatchAll(harmonyInstance.Id);
+                    Object.Destroy(ScriptManager);
+                }
+                flag = true;
+            }
+            return flag;
         }
         public static bool Unload(UnityModManager.ModEntry modEntry)
         {
