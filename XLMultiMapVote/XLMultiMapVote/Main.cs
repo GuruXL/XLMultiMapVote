@@ -5,6 +5,7 @@ using UnityModManagerNet;
 using RapidGUI;
 using ModIO.UI;
 using XLMultiMapVote.Data;
+using XLMultiMapVote.Utils;
 
 namespace XLMultiMapVote
 {
@@ -33,7 +34,7 @@ namespace XLMultiMapVote
         }
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
-            if (!MultiplayerManager.Instance.InRoom)
+            if (!multiMapVote.IsInRoom())
                 return;
 
             GUILayout.BeginVertical("Box"); // Main Box
@@ -46,15 +47,55 @@ namespace XLMultiMapVote
 
             GUILayout.Space(6);
 
-            GUILayout.Label("Options");
-            GUILayout.BeginHorizontal();
-            RGUI.BeginBackgroundColor(Color.cyan);
-            if (GUILayout.Button("Show PopUp", RGUIStyle.button, GUILayout.Width(128)))
+            if (multiMapVote.IsHost())
             {
-                multiMapVote.ShowPlayerPopUp(PopUpMessage.message, true, 10f);
+                GUILayout.Label("Options");
+                GUILayout.BeginHorizontal();
+                RGUI.BeginBackgroundColor(Color.cyan);
+                if (GUILayout.Button("Queue Vote", RGUIStyle.button, GUILayout.Width(128)))
+                {
+                    multiMapVote.ShowPlayerPopUp(PopUpLabels.message, true, settings.popUpTime);
+                }
+                RGUI.EndBackgroundColor();
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                RGUI.BeginBackgroundColor(Color.cyan);
+                settings.popUpTime = RGUI.Field(Mathf.RoundToInt(settings.popUpTime), "Time: ", GUILayout.MaxWidth(96));
+                RGUI.EndBackgroundColor();
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                string voteResults = string.Join("\n", multiMapVote.GetVoteList());
+                GUILayout.Label($"Votes: \n{voteResults}");
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+
+                GUILayout.Space(6);
+
+                GUILayout.BeginVertical("Box");
+                RGUI.BeginBackgroundColor(Color.cyan);
+                settings.selectedMap = RGUI.SelectionPopup(settings.selectedMap, MapHelper.GetMaps());
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("Add Map", RGUIStyle.button, GUILayout.Width(128)))
+                {
+                    multiMapVote.AddMapToOptions(settings.selectedMap);
+                    settings.selectedMap = PopUpLabels.addMapText;
+                }
+                if (GUILayout.Button("Clear List", RGUIStyle.button, GUILayout.Width(128)))
+                {
+                    multiMapVote.ClearPopUpOptions();
+                }
+                GUILayout.EndHorizontal();
+                foreach (string option in multiMapVote.popUpOptions)
+                {
+                    GUILayout.BeginVertical("Box");
+                    GUILayout.Label(option, GUILayout.Width(256));
+                    GUILayout.EndVertical();
+                }
+                RGUI.EndBackgroundColor();
+                GUILayout.EndVertical();
             }
-            RGUI.EndBackgroundColor();
-            GUILayout.EndHorizontal();
 
             GUILayout.EndVertical(); // main Box
         }

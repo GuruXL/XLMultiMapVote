@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
+    <Compile Include="XLMultiMapVote.Utils\MapHelper.cs" />
     <Compile Include="XLMultiMapVote\Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RapidGUI\Button.cs" />
@@ -159,7 +160,12 @@
     <Compile Include="RapidGUI\Utilities\WindowInvoker.cs" />
     <Compile Include="XLMultiMapVote\Settings.cs" />
     <Compile Include="XLMultiMapVote\XLMultiTools.cs" />
-    <Compile Include="XLMutliMapVote.Data\PopUpMessage.cs" />
+    <Compile Include="XLMutliMapVote.Data\PopUpLabels.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

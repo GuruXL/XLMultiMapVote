@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityModManagerNet;
+using XLMultiMapVote.Data;
 using RapidGUI;
 
 namespace XLMultiMapVote
@@ -11,6 +12,10 @@ namespace XLMultiMapVote
     public class Settings : UnityModManager.ModSettings, IDrawable
     {
         public bool allowPopUps = true;
+
+        public float popUpTime = 10f;
+
+        public string selectedMap = PopUpLabels.addMapText;
 
         public void OnChange()
         {
