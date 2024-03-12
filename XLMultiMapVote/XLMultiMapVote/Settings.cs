@@ -17,6 +17,8 @@ namespace XLMultiMapVote
 
         public string selectedMap = PopUpLabels.addMapText;
 
+        public string filterString = "";
+
         public void OnChange()
         {
             throw new NotImplementedException();

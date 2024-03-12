@@ -54,7 +54,11 @@ namespace XLMultiMapVote
                 RGUI.BeginBackgroundColor(Color.cyan);
                 if (GUILayout.Button("Queue Vote", RGUIStyle.button, GUILayout.Width(128)))
                 {
-                    multiMapVote.ShowPlayerPopUp(PopUpLabels.message, true, settings.popUpTime);
+                    multiMapVote.StartCoroutine(multiMapVote.ChangeMap());
+
+                    multiMapVote.ShowPlayerPopUp(PopUpLabels.popUpMessage, true, settings.popUpTime);
+                    multiMapVote.ShowMessage(PopUpLabels.changeMapMessage, 4f);
+                    multiMapVote.StartCountdown(settings.popUpTime);
                 }
                 RGUI.EndBackgroundColor();
                 GUILayout.EndHorizontal();
@@ -75,7 +79,19 @@ namespace XLMultiMapVote
 
                 GUILayout.BeginVertical("Box");
                 RGUI.BeginBackgroundColor(Color.cyan);
-                settings.selectedMap = RGUI.SelectionPopup(settings.selectedMap, MapHelper.GetMaps());
+                string[] mapList;
+                GUILayout.BeginVertical();
+                settings.filterString = RGUI.Field(settings.filterString, "Filter Map List", GUILayout.Width(256));
+                GUILayout.EndVertical();
+                if (!string.IsNullOrEmpty(settings.filterString))
+                {
+                    mapList = MapHelper.FilterArray(MapHelper.GetMapNames(), settings.filterString);
+                }
+                else
+                {
+                    mapList = MapHelper.GetMapNames();
+                }
+                settings.selectedMap = RGUI.SelectionPopup(settings.selectedMap, mapList);
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Add Map", RGUIStyle.button, GUILayout.Width(128)))
                 {

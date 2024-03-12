@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 namespace XLMultiMapVote.Utils
 {
@@ -13,25 +14,45 @@ namespace XLMultiMapVote.Utils
         public static List<LevelInfo> combinedMapList = new List<LevelInfo>();
         public static string[] mapNames;
 
-        public static string [] GetMaps()
+        public static LevelInfo GetMapInfo(string votedMap)
+        {
+            if (combinedMapList?.Count > 0)
+            {
+                foreach (LevelInfo level in combinedMapList)
+                {
+                    if (level.name == votedMap)
+                    {
+                        return level;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static List<LevelInfo> GetMaps()
         {
             combinedMapList.Clear();
-            mapNames = new string[] {};
-
+            
             if (LevelManager.Instance.Levels != null)
             {
                 combinedMapList.AddRange(LevelManager.Instance.Levels.ToList());
-            }
-            if (LevelManager.Instance.ModLevels != null)
-            {
-                combinedMapList.AddRange(LevelManager.Instance.ModLevels.ToList());
             }
             if (LevelManager.Instance.CommunityLevels != null)
             {
                 combinedMapList.AddRange(LevelManager.Instance.CommunityLevels.ToList());
             }
+            if (LevelManager.Instance.ModLevels != null)
+            {
+                combinedMapList.AddRange(LevelManager.Instance.ModLevels.ToList());
+            }
 
-            mapNames = ConvertToString(combinedMapList);
+            return combinedMapList;
+        }
+
+        public static string [] GetMapNames()
+        {
+            mapNames = new string[] { };
+            mapNames = ConvertToString(GetMaps());
             return mapNames;
         }
 
@@ -45,7 +66,19 @@ namespace XLMultiMapVote.Utils
             }
             return names;
         }
+        public static string[] FilterArray(string[] mapNames, string searchString)
+        {
+            // Split the search string into lowercase words
+            string[] searchWords = searchString.ToLower().Split(' ');
 
+            // Filter the array based on the search string
+            return mapNames.Where(s =>
+            {
+                // Check if all search words are contained in the string
+                return searchWords.All(searchWord => s.ToLower().Contains(searchWord));
+            }).ToArray();
+        }
+        /*
         public static string[] FilterArray(string[] filteredStrings, string searchstring)
         {
             string[] searchWords = searchstring.ToLower().Split(' ');
@@ -64,5 +97,6 @@ namespace XLMultiMapVote.Utils
                 return containsAllWords;
             }).ToArray();
         }
+        */
     }
 }

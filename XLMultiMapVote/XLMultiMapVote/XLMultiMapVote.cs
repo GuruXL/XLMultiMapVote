@@ -9,6 +9,7 @@ using System.Linq;
 using Photon.Pun;
 using Photon.Realtime;
 using XLMultiMapVote.Data;
+using XLMultiMapVote.Utils;
 
 namespace XLMultiMapVote
 {
@@ -23,25 +24,6 @@ namespace XLMultiMapVote
 
         public Dictionary<int, int> voteIndex = new Dictionary<int, int>();
 
-        private void Awake()
-        {
-            MultiplayerManager.Instance.OnRoomJoined += OnJoined;
-        }
-
-        private void OnDestroy()
-        {
-            MultiplayerManager.Instance.OnRoomJoined -= OnJoined;
-        }
-
-        private void OnJoined()
-        {
-
-        }
-
-        private void Update()
-        {
-           
-        }
         public bool IsHost()
         {
             if (MultiplayerManager.Instance.IsMasterClient)
@@ -92,13 +74,61 @@ namespace XLMultiMapVote
             }
             return votes;
         }
-
         private void PopulateVoteIndex()
         {
             for (int i = 0; i < popUpOptions.Length; i++)
             {
                 voteIndex[i] = 0; // Initialize all vote counts to 0
             }
+        }
+        public IEnumerator ChangeMap()
+        {
+            yield return new WaitForSeconds(Main.settings.popUpTime);
+            string votedMap = GetVotedMap();
+            ShowMessage($"Map changing to: { votedMap }", 3f);
+            MultiplayerManager.Instance.LoadLevel(MapHelper.GetMapInfo(votedMap), true);
+            ClearPopUpOptions();
+            yield return null;
+        }
+
+        private string GetVotedMap()
+        {
+            if (voteIndex.Count == 0)
+            {
+                return null;
+            }
+
+            // Find the highest vote count
+            int maxVotes = voteIndex.Values.Max();
+            // Find all options that received the maximum number of votes
+            var tiedOptions = voteIndex.Where(pair => pair.Value == maxVotes).Select(pair => pair.Key).ToList();
+
+            // If there is only one option with the highest votes, return it
+            if (tiedOptions.Count == 1)
+            {
+                // Make sure the index is valid for mapOptions
+                if (tiedOptions[0] >= 0 && tiedOptions[0] < popUpOptions.Length)
+                {
+                    return popUpOptions[tiedOptions[0]];
+                }
+            }
+            else if (tiedOptions.Count > 1) // A tie exists
+            {
+                return ChooseMapOnTie(voteIndex, popUpOptions);
+            }
+
+            return null;
+        }
+        public string ChooseMapOnTie(Dictionary<int, int> voteIndex, string[] mapOptions)
+        {
+            // This function assumes there is already a tie and doesn't check it by itself
+            int maxVotes = voteIndex.Values.Max();
+            var tiedOptions = voteIndex.Where(pair => pair.Value == maxVotes).Select(pair => pair.Key).ToList();
+
+            int randomIndex = UnityEngine.Random.Range(0, tiedOptions.Count);
+            int chosenOptionIndex = tiedOptions[randomIndex];
+
+            return mapOptions[chosenOptionIndex];
         }
 
         public void ShowPlayerPopUp(string message, bool pauseGame, float time)
@@ -115,12 +145,11 @@ namespace XLMultiMapVote
         {
             popUpCallBack = (optionIndex) => {
                 // Handle the selected option here
-                Main.Logger.Log($"option {optionIndex} Selected");
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Info, $"option {optionIndex} Selected", 2.5f);
+                //Main.Logger.Log($"{GetOptionName(optionIndex)} Selected");
+                //MessageSystem.QueueMessage(MessageDisplayData.Type.Info, $"option {optionIndex} Selected", 2.5f);
                 LogPlayerChoice(optionIndex);
             };
         }
-
         private void LogPlayerChoice(int optionIndex)
         {
             if (voteIndex.ContainsKey(optionIndex))
@@ -128,6 +157,19 @@ namespace XLMultiMapVote
                 voteIndex[optionIndex]++;
             }
         }
+        public string GetOptionName(int index)
+        {
+            // Check if the index is within the bounds of the popUpOptions array
+            if (index >= 0 && index < popUpOptions.Length)
+            {
+                return popUpOptions[index]; // Return the matching option
+            }
+            else
+            {
+                return "Option";
+            }
+        }
+
         public void StartCountdown(float time)
         {
             ForEachPlayer(player => player.ShowCountdown(time));
@@ -138,30 +180,7 @@ namespace XLMultiMapVote
             ForEachPlayer(player => player.ShowMessage(message, time));
         }
 
-        public string ChooseMapOnTie(Dictionary<int, int> voteIndex, string[] mapOptions)
-        {
-            // Find the highest vote count
-            int maxVotes = voteIndex.Values.Max();
-
-            // Find all options that received the maximum number of votes
-            var tiedOptions = voteIndex.Where(pair => pair.Value == maxVotes).Select(pair => pair.Key).ToList();
-
-            // Choose one of these options randomly if there's more than one
-            if (tiedOptions.Count > 1)
-            {
-                int randomIndex = UnityEngine.Random.Range(0, tiedOptions.Count); // Using Unity's Random for example
-                int chosenOptionIndex = tiedOptions[randomIndex];
-                // Inform players about the tie and the randomly selected option
-                // Example: MessageSystem.QueueMessage(MessageDisplayData.Type.Info, $"Tie detected. Randomly selected {mapOptions[chosenOptionIndex]} as the next map.", 2.5f);
-                return mapOptions[chosenOptionIndex];
-            }
-            else
-            {
-                // Only one option won outright
-                return mapOptions[tiedOptions.First()];
-            }
-        }
-
+        
         public void AddMapToOptions(string selectedMap)
         {
             if (string.IsNullOrEmpty(selectedMap) || selectedMap.Contains(PopUpLabels.addMapText))
