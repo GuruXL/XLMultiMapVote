@@ -83,12 +83,12 @@ namespace XLMultiMapVote
         }
         public IEnumerator ChangeMap()
         {
-            yield return new WaitForSeconds(Main.settings.popUpTime);
+            //yield return new WaitForSeconds(Main.settings.popUpTime);
+            yield return new WaitForSecondsRealtime(Main.settings.popUpTime);
             string votedMap = GetVotedMap();
-            ShowMessage($"Map changing to: { votedMap }", 3f);
-            MultiplayerManager.Instance.LoadLevel(MapHelper.GetMapInfo(votedMap), true);
+            ShowMessage($"Map changing to: { votedMap }", 5f);
+            LevelManager.Instance.LoadLevel(MapHelper.GetMapInfo(votedMap));
             ClearPopUpOptions();
-            yield return null;
         }
 
         private string GetVotedMap()
@@ -101,18 +101,18 @@ namespace XLMultiMapVote
             // Find the highest vote count
             int maxVotes = voteIndex.Values.Max();
             // Find all options that received the maximum number of votes
-            var tiedOptions = voteIndex.Where(pair => pair.Value == maxVotes).Select(pair => pair.Key).ToList();
+            var votedOptions = voteIndex.Where(pair => pair.Value == maxVotes).Select(pair => pair.Key).ToList();
 
             // If there is only one option with the highest votes, return it
-            if (tiedOptions.Count == 1)
+            if (votedOptions.Count == 1)
             {
                 // Make sure the index is valid for mapOptions
-                if (tiedOptions[0] >= 0 && tiedOptions[0] < popUpOptions.Length)
+                if (votedOptions[0] >= 0 && votedOptions[0] < popUpOptions.Length)
                 {
-                    return popUpOptions[tiedOptions[0]];
+                    return popUpOptions[votedOptions[0]];
                 }
             }
-            else if (tiedOptions.Count > 1) // A tie exists
+            else if (votedOptions.Count > 1) // A tie exists
             {
                 return ChooseMapOnTie(voteIndex, popUpOptions);
             }

@@ -57,7 +57,7 @@ namespace XLMultiMapVote
                     multiMapVote.StartCoroutine(multiMapVote.ChangeMap());
 
                     multiMapVote.ShowPlayerPopUp(PopUpLabels.popUpMessage, true, settings.popUpTime);
-                    multiMapVote.ShowMessage(PopUpLabels.changeMapMessage, 4f);
+                    multiMapVote.ShowMessage(PopUpLabels.changeMapMessage, 5f);
                     multiMapVote.StartCountdown(settings.popUpTime);
                 }
                 RGUI.EndBackgroundColor();

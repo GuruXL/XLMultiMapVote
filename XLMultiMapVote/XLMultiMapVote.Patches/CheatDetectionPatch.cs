@@ -12,12 +12,11 @@ namespace XLMultiMapVote.Patches
         {
             if (type == CheatDetection.ControlType.Popup && Main.settings.allowPopUps)
             {
-                __result = true; // Bypass cheat detection for popup controls
-                Main.Logger.Log("Cheat Detection Bypassed");
+                __result = true; // Bypass cheat detection
+                //Main.Logger.Log("Cheat Detection Bypassed");
                 return false; // Skip the original method
             }
-            // For other control types, continue with the original method
-            return true;
+            return true; // continue with the original method
         }
     }
 }
