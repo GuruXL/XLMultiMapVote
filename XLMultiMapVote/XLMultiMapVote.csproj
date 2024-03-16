@@ -99,6 +99,10 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -132,7 +136,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
+    <Compile Include="XLMultiMapVote.UI\UIController.cs" />
+    <Compile Include="XLMultiMapVote.Utils\AssetLoader.cs" />
     <Compile Include="XLMultiMapVote.Utils\MapHelper.cs" />
+    <Compile Include="XLMultiMapVote.Utils\ResourceExtractor.cs" />
     <Compile Include="XLMultiMapVote\Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RapidGUI\Button.cs" />
@@ -166,6 +173,7 @@
     <None Include="Info.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="Resources\mapvoteui" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

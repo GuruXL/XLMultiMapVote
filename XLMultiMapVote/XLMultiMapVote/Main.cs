@@ -6,6 +6,7 @@ using RapidGUI;
 using ModIO.UI;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
+using XLMultiMapVote.UI;
 
 namespace XLMultiMapVote
 {
@@ -19,6 +20,7 @@ namespace XLMultiMapVote
         public static Settings settings;
         public static GameObject ScriptManager;
         public static XLMultiMapVote multiMapVote;
+        public static UIController uiController;
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
@@ -136,12 +138,15 @@ namespace XLMultiMapVote
                     harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
                     ScriptManager = new GameObject("XLMultiMapVote");
                     multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
-
+                    uiController = ScriptManager.AddComponent<UIController>();
                     Object.DontDestroyOnLoad(ScriptManager);
+
+                    AssetLoader.LoadBundles();
                 }
                 else
                 {
                     harmonyInstance.UnpatchAll(harmonyInstance.Id);
+                    AssetLoader.UnloadAssetBundle();
                     Object.Destroy(ScriptManager);
                 }
                 flag = true;
@@ -150,6 +155,9 @@ namespace XLMultiMapVote
         }
         public static bool Unload(UnityModManager.ModEntry modEntry)
         {
+            harmonyInstance.UnpatchAll(harmonyInstance.Id);
+            AssetLoader.UnloadAssetBundle();
+            Object.Destroy(ScriptManager);
             Logger.Log(nameof(Unload));
             return true;
         }
