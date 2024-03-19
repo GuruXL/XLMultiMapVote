@@ -24,6 +24,8 @@ namespace XLMultiMapVote
 
         public Dictionary<int, int> voteIndex = new Dictionary<int, int>();
 
+        public VoteState voteState = new VoteState();
+
         public bool IsHost()
         {
             if (MultiplayerManager.Instance.IsMasterClient)
@@ -204,6 +206,15 @@ namespace XLMultiMapVote
         {
             popUpOptions = new string[] {};
             voteIndex = new Dictionary<int, int>();
+        }
+
+        public void QueueVote()
+        {
+            StartCoroutine(ChangeMap());
+
+            ShowPlayerPopUp(PopUpLabels.popUpMessage, true, Main.settings.popUpTime);
+            ShowMessage(PopUpLabels.changeMapMessage, 5f);
+            StartCountdown(Main.settings.popUpTime);
         }
     }
 }

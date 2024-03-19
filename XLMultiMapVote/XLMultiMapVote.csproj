@@ -64,6 +64,10 @@
     <Reference Include="PhotonUnityNetworking.Utilities">
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\PhotonUnityNetworking.Utilities.dll</HintPath>
     </Reference>
+    <Reference Include="Rewired_Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\Rewired_Core.dll</HintPath>
+    </Reference>
     <Reference Include="SkaterXL.Core">
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\SkaterXL.Core.dll</HintPath>
     </Reference>
@@ -95,6 +99,10 @@
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\UnityEngine.dll</HintPath>
@@ -135,6 +143,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="XLMultiMapVote.Patches\GameStateMachinePatch.cs" />
+    <Compile Include="XLMultiMapVote.Patches\MultiplayerMenuPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
     <Compile Include="XLMultiMapVote.UI\UIController.cs" />
     <Compile Include="XLMultiMapVote.Utils\AssetLoader.cs" />
@@ -167,6 +177,7 @@
     <Compile Include="RapidGUI\Utilities\WindowInvoker.cs" />
     <Compile Include="XLMultiMapVote\Settings.cs" />
     <Compile Include="XLMultiMapVote\XLMultiMapVote.cs" />
+    <Compile Include="XLMutliMapVote.Data\VoteState.cs" />
     <Compile Include="XLMutliMapVote.Data\PopUpLabels.cs" />
   </ItemGroup>
   <ItemGroup>

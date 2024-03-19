@@ -46,19 +46,8 @@ namespace XLMultiMapVote.Utils
                 yield break;
             }
             yield return GameStateMachine.Instance.StartCoroutine(LoadAssetFromBundle());
-            //yield return GameStateMachine.Instance.StartCoroutine(LoadPrefabs());
         }
-        /*
-        private static IEnumerator LoadPrefabs()
-        {
-            if (assetBundle == null)
-            {
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"XLMultiMapVote Asset bundles are not loaded!", 2.5f);
-                yield break;
-            }
-            yield return GameStateMachine.Instance.StartCoroutine(LoadAssetFromBundle());
-        }
-        */
+
         private static IEnumerator LoadAssetFromBundle()
         {
             MapVoteUIPrefab = assetBundle.LoadAsset<GameObject>("MapVoteUI");
