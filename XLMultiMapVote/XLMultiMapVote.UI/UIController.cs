@@ -31,8 +31,10 @@ namespace XLMultiMapVote.UI
         public Dropdown uiDropDownList;
         public Text mapLabelPrefab;
 
+        public List<Text> mapLabelList = new List<Text>();
+
         private Button addMapButton;
-        private Button ClearMapButton;
+        private Button clearMapButton;
         private Button voteButton;
         private Button exitButton;
 
@@ -48,7 +50,6 @@ namespace XLMultiMapVote.UI
         {
             GetButtonPrefab();
             CreateMenuButton();
-            SetUpListeners();
         }
 
         private void OnDestroy()
@@ -65,6 +66,9 @@ namespace XLMultiMapVote.UI
             mapVoteUIobj.transform.SetParent(Main.ScriptManager.transform);
             mapVoteUIobj.SetActive(false);
             Main.multiMapVote.voteState = mapVoteUIobj.AddComponent<VoteState>();
+
+            GetUIComponents();
+            SetUpListeners();
         }
 
         private void GetButtonPrefab()
@@ -82,31 +86,27 @@ namespace XLMultiMapVote.UI
             }
         }
 
-        private void NewButton(GameObject buttonPrefab, MenuButton customButton, string buttonName, UnityAction newListener, bool active)
-        {
-            if (customButton == null)
-            {
-                GameObject newButton = Instantiate(buttonPrefab, buttonPrefab.transform.parent);
-                newButton.transform.SetSiblingIndex(buttonPrefab.transform.GetSiblingIndex() + 1); // adds new button one place below button prefab
-                newButton.name = buttonName;
-
-                customButton = newButton.GetComponent<MenuButton>();
-
-                customButton.GreyedOut = false;
-                customButton.GreyedOutInfoText = buttonName;
-                customButton.Label.SetText(buttonName);
-                customButton.interactable = true;
-
-                customButton.onClick.RemoveAllListeners();  // Remove existing listeners
-                customButton.onClick.SetPersistentListenerState(0, UnityEventCallState.Off); // removes persistant listeners that are set in unity editor.
-                customButton.onClick.AddListener(newListener);  // Add new listener
-
-                customButton.gameObject.SetActive(active);
-            }
-        }
         private void CreateMenuButton()
         {
-            NewButton(menuButtonPrefab.gameObject, customMenuButton, "Vote For Map", MenuButtonOnClick, false);
+            if (customMenuButton == null)
+            {
+                GameObject newButton = Instantiate(menuButtonPrefab.gameObject, menuButtonPrefab.transform.parent);
+                newButton.transform.SetSiblingIndex(menuButtonPrefab.gameObject.transform.GetSiblingIndex() + 1); // adds new button one place below button prefab
+                newButton.name = "Vote For Map";
+
+                customMenuButton = newButton.GetComponent<MenuButton>();
+
+                customMenuButton.GreyedOut = false;
+                customMenuButton.GreyedOutInfoText = "Vote For Map";
+                customMenuButton.Label.SetText("Vote For Map");
+                customMenuButton.interactable = true;
+
+                customMenuButton.onClick.RemoveAllListeners();  // Remove existing listeners
+                customMenuButton.onClick.SetPersistentListenerState(0, UnityEventCallState.Off); // removes persistant listeners that are set in unity editor.
+                customMenuButton.onClick.AddListener(() => MenuButtonOnClick());  // Add new listener
+
+                customMenuButton.gameObject.SetActive(false);
+            }
         }
         public void DestroyMenuButton()
         {
@@ -124,101 +124,69 @@ namespace XLMultiMapVote.UI
 
         public void EnterVoteUI()
         {
-            Time.timeScale = 0f;
+            //Time.timeScale = 0f;
             mapVoteUIobj.SetActive(true);
             GameStateMachine.Instance.SemiTransparentLayer.SetActive(false);
-
-            // Set the first selectable item in the Event System
-            if (uiDropDownList != null)
-            {
-                EventSystem.current.SetSelectedGameObject(uiDropDownList.gameObject);
-            }
-
+            //EventSystem.current.SetSelectedGameObject(uiDropDownList.gameObject);
             UpdateMapList();
         }
+
         public void ExitVoteUI()
         {
            mapVoteUIobj.SetActive(false);
         }
-        
+
         private void GetUIComponents()
         {
-            List<Button> uiButtons = new List<Button>();
-            List<InputField> uiInputFields = new List<InputField>();
+            Transform addobj = mapVoteUIobj.transform.FindChildRecursively("Button_AddMap");
+            addMapButton = addobj.GetComponent<Button>();
 
-            // Get Buttons
-            Button[] buttons = mapVoteUIobj.GetComponentsInChildren<Button>();
-            uiButtons = buttons.ToList();
-            addMapButton = GetButton(uiButtons, "Button_AddMap");
-            ClearMapButton = GetButton(uiButtons, "Button_ClearMapList");
-            voteButton = GetButton(uiButtons, "Button_Vote");
-            exitButton = GetButton(uiButtons, "Button_Exit");
+            Transform clearobj = mapVoteUIobj.transform.FindChildRecursively("Button_ClearMapList");
+            clearMapButton = clearobj.GetComponent<Button>();
 
-            // Get input fields
-            InputField [] fields = mapVoteUIobj.GetComponentsInChildren<InputField>();
-            uiInputFields = fields.ToList();
-            filterMapsInput = GetInputField(uiInputFields, "InputField_FilterMap");
-            timerInput = GetInputField(uiInputFields, "InputField_PopupTime");
+            Transform voteobj = mapVoteUIobj.transform.FindChildRecursively("Button_Vote");
+            voteButton = voteobj.GetComponent<Button>();
 
-            // Get Drop Down List for Maps
-            uiDropDownList = mapVoteUIobj.GetComponentInChildren<Dropdown>();
+            Transform exitobj = mapVoteUIobj.transform.FindChildRecursively("Button_Exit");
+            exitButton = exitobj.GetComponent<Button>();
 
-            // Get Map Label Prefab For Map List Generaetion
-            VerticalLayoutGroup mapListLayout;
-            mapListLayout = mapVoteUIobj.GetComponentInChildren<VerticalLayoutGroup>();
-            mapLabelPrefab = mapListLayout.GetComponentInChildren<Text>(true);
-        }
+            Transform filterobj = mapVoteUIobj.transform.FindChildRecursively("InputField_FilterMap");
+            filterMapsInput = filterobj.GetComponent<InputField>();
 
-        private Button GetButton(List<Button> buttonList, string name)
-        {
-            foreach (Button button in buttonList)
-            {
-                if (button.gameObject.name == name)
-                {
-                    return button;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            return null;
-        }
-        private InputField GetInputField(List<InputField> inputList, string name)
-        {
-            foreach (InputField field in inputList)
-            {
-                if (field.gameObject.name == name)
-                {
-                    return field;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            return null;
+            Transform timerobj = mapVoteUIobj.transform.FindChildRecursively("InputField_PopupTime");
+            timerInput = timerobj.GetComponent<InputField>();
+
+            Transform dropdownobj = mapVoteUIobj.transform.FindChildRecursively("MapListDropDown");
+            uiDropDownList = dropdownobj.GetComponent<Dropdown>();
+
+            Transform maplabelobj = mapVoteUIobj.transform.FindChildRecursively("TextLabelPrefab");
+            mapLabelPrefab = maplabelobj.GetComponent<Text>();
         }
 
         private void SetUpListeners()
         {
             addMapButton.onClick.AddListener(()=> AddMap());
-            ClearMapButton.onClick.AddListener(() => ClearMapList());
+            clearMapButton.onClick.AddListener(() => ClearMapList());
             voteButton.onClick.AddListener(() => VoteButton());
             exitButton.onClick.AddListener(() => ExitButton());
 
-            filterMapsInput.onEndEdit.AddListener(delegate { UpdateMapList(); });
+            //filterMapsInput.onEndEdit.AddListener(delegate { UpdateMapList(); });
+            filterMapsInput.onValueChanged.AddListener(delegate { UpdateMapList(); });
             timerInput.onEndEdit.AddListener(delegate { UpdateTimerValue(); });
+
+            //uiDropDownList.onValueChanged.AddListener(delegate { UpdateMapList(); });
         }
         private void RemoveListeners()
         {
             addMapButton.onClick.RemoveAllListeners();
-            ClearMapButton.onClick.RemoveAllListeners();
+            clearMapButton.onClick.RemoveAllListeners();
             voteButton.onClick.RemoveAllListeners();
             exitButton.onClick.RemoveAllListeners();
 
             filterMapsInput.onEndEdit.RemoveAllListeners();
             timerInput.onEndEdit.RemoveAllListeners();
+
+            //uiDropDownList.onValueChanged.RemoveAllListeners();
         }
 
         private void AddMap()
@@ -227,44 +195,57 @@ namespace XLMultiMapVote.UI
                 return;
 
             Main.multiMapVote.AddMapToOptions(uiDropDownList.captionText.text);
+            CreateMapListLabel(uiDropDownList.captionText.text);
         }
 
         private void ClearMapList()
         {
             Main.multiMapVote.ClearPopUpOptions();
-            ClearDropDownList();
-
-            // ** add function to destroy Created Map Label Objects **
+            ClearMapLabels();
+            SetDropDownCaption(PopUpLabels.addMapText);
         }
 
         private void ExitButton()
         {
-            GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);
+            //GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);
+            GameStateMachine.Instance.RequestPlayState();
         }
 
         private void VoteButton()
         {
+            if (uiDropDownList.options.Count <= 0)
+                return;
+
             Main.multiMapVote.QueueVote();
+            ClearDropDownList();
+            ClearMapLabels();
+            GameStateMachine.Instance.RequestPlayState();
         }
 
         private void PopulateDropDownList()
         {
-            Dropdown.OptionDataList dropdownlist = new Dropdown.OptionDataList();
+            List<Dropdown.OptionData> dropdownlist = new List<Dropdown.OptionData>();
             string[] mapList = FilterMaps();
 
-            for (int i = 0; i > mapList.Length; i++)
+            for (int i = 0; i < mapList.Length; i++)
             {
                 Dropdown.OptionData data = new Dropdown.OptionData();
                 data.text = mapList[i];
-                dropdownlist.options.Add(data);
+                dropdownlist.Add(data); // Add the new option to the list
             }
-
-            uiDropDownList.options = dropdownlist.options;
+            //uiDropDownList.options.AddRange(dropdownlist);
+            uiDropDownList.AddOptions(dropdownlist);
         }
 
         private void ClearDropDownList()
         {
             uiDropDownList.ClearOptions();
+            SetDropDownCaption(PopUpLabels.addMapText);
+        }
+
+        private void SetDropDownCaption(string text)
+        {
+            uiDropDownList.captionText.text = text;
         }
 
         private string[] FilterMaps()
@@ -299,9 +280,45 @@ namespace XLMultiMapVote.UI
             PopulateDropDownList();
         }
 
-        private void CreateMapListLabel()
+        private void CreateMapListLabel(string mapName)
         {
+            if (string.IsNullOrEmpty(mapName) || mapName.Contains(PopUpLabels.addMapText))
+            {
+                return;
+            }
 
+            foreach (Text label in mapLabelList)
+            {
+                if (label.text == mapName)
+                {
+                    return; // skip creation if new label is a duplicate.
+                }
+            }
+
+            GameObject newListObj = Instantiate(mapLabelPrefab.gameObject, mapLabelPrefab.gameObject.transform.parent);
+            newListObj.SetActive(true);
+            Text newListItem = newListObj.GetComponent<Text>();
+            newListItem.text = mapName;
+            newListItem.name = mapName;
+            mapLabelList.Add(newListItem);
         }
+
+        private void ClearMapLabels()
+        {
+            StartCoroutine(DestroyLabelObjects());
+        }
+        private IEnumerator DestroyLabelObjects()
+        {
+            foreach (Text item in mapLabelList)
+            {
+                item.gameObject.SetActive(false);
+                Destroy(item.gameObject);
+                yield return new WaitForEndOfFrame();
+            }
+
+            mapLabelList.Clear();
+        }
+
+       
     }
 }

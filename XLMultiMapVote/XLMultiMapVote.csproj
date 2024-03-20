@@ -143,7 +143,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="XLMultiMapVote.Patches\GameStateMachinePatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\MultiplayerMenuPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
     <Compile Include="XLMultiMapVote.UI\UIController.cs" />
