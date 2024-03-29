@@ -5,25 +5,28 @@ using Photon.Pun;
 
 namespace XLMultiMapVote.Patches
 {
-    /*
+    
     [HarmonyPatch(typeof(MultiplayerMainMenu))]
     [HarmonyPatch("OnEnable")]
     public static class MultiplayerMenuPatch
     {
         public static void Postfix(MultiplayerMainMenu __instance)
         {
-            if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom != null && MultiplayerManager.Instance.IsMasterClient)
-            {
-                Main.uiController.customMenuButton.gameObject.SetActive(true);
-            }
-
-            else if (PhotonNetwork.InLobby && Main.uiController.customMenuButton.gameObject.activeSelf)
+            if (PhotonNetwork.InLobby && Main.uiController.customMenuButton.gameObject.activeSelf)
             {
                 Main.uiController.customMenuButton.gameObject.SetActive(false);
             }
+            else if (PhotonNetwork.InRoom && !PhotonNetwork.IsMasterClient && Main.uiController.customMenuButton.gameObject.activeSelf)
+            {
+                Main.uiController.customMenuButton.gameObject.SetActive(false);
+            }
+            else if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom != null && PhotonNetwork.IsMasterClient)
+            {
+                Main.uiController.customMenuButton.gameObject.SetActive(true);
+            }
         }
     }
-    */
+    
 
     [HarmonyPatch(typeof(MultiplayerMainMenu))]
     [HarmonyPatch("OnJoinedRoom")]
@@ -31,7 +34,7 @@ namespace XLMultiMapVote.Patches
     {
         public static void Postfix()
         {
-            if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom != null && MultiplayerManager.Instance.IsMasterClient)
+            if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom != null && PhotonNetwork.IsMasterClient)
             {
                 if (!Main.uiController.customMenuButton.gameObject.activeSelf)
                 {

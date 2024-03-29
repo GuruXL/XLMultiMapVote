@@ -26,6 +26,8 @@ namespace XLMultiMapVote
 
         public VoteState voteState = new VoteState();
 
+        public bool isMapchanging { get; private set; } = false;
+
         public bool IsHost()
         {
             if (MultiplayerManager.Instance.IsMasterClient)
@@ -85,12 +87,25 @@ namespace XLMultiMapVote
         }
         public IEnumerator ChangeMap()
         {
+            isMapchanging = true;
             //yield return new WaitForSeconds(Main.settings.popUpTime);
             yield return new WaitForSecondsRealtime(Main.settings.popUpTime);
             string votedMap = GetVotedMap();
-            ShowMessage($"Map changing to: { votedMap }", 5f);
-            LevelManager.Instance.LoadLevel(MapHelper.GetMapInfo(votedMap));
-            ClearPopUpOptions();
+
+            if (!String.IsNullOrEmpty(votedMap) || MapHelper.GetMapInfo(votedMap) != null)
+            {
+                ShowMessage($"Map changing to: { votedMap }", 5f);
+                //LevelManager.Instance.LoadLevel(MapHelper.GetMapInfo(votedMap));
+                LevelManager.Instance.PlayLevel(MapHelper.GetMapInfo(votedMap));
+                ClearPopUpOptions();
+                isMapchanging = false;
+            }
+            else
+            {
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Error, "Cannot Change Maps: Map is Invald", 2.5f);
+                Main.Logger.Log("Cannot Change Maps: Map is Invald");
+                isMapchanging = false;
+            }
         }
 
         private string GetVotedMap()
@@ -210,6 +225,9 @@ namespace XLMultiMapVote
 
         public void QueueVote()
         {
+            if (isMapchanging || popUpOptions.Length <= 1)
+                return;
+
             StartCoroutine(ChangeMap());
 
             ShowPlayerPopUp(PopUpLabels.popUpMessage, true, Main.settings.popUpTime);

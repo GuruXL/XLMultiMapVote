@@ -145,6 +145,7 @@
   <ItemGroup>
     <Compile Include="XLMultiMapVote.Patches\MultiplayerMenuPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
+    <Compile Include="XLMultiMapVote.UI\ScrollRectAutoScroll.cs" />
     <Compile Include="XLMultiMapVote.UI\UIController.cs" />
     <Compile Include="XLMultiMapVote.Utils\AssetLoader.cs" />
     <Compile Include="XLMultiMapVote.Utils\MapHelper.cs" />

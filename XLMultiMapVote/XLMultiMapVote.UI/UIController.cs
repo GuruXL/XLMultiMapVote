@@ -68,6 +68,7 @@ namespace XLMultiMapVote.UI
             Main.multiMapVote.voteState = mapVoteUIobj.AddComponent<VoteState>();
 
             GetUIComponents();
+            AddUIComponents();
             SetUpListeners();
         }
 
@@ -91,7 +92,8 @@ namespace XLMultiMapVote.UI
             if (customMenuButton == null)
             {
                 GameObject newButton = Instantiate(menuButtonPrefab.gameObject, menuButtonPrefab.transform.parent);
-                newButton.transform.SetSiblingIndex(menuButtonPrefab.gameObject.transform.GetSiblingIndex() + 1); // adds new button one place below button prefab
+                //newButton.transform.SetSiblingIndex(menuButtonPrefab.gameObject.transform.GetSiblingIndex() + 1); // adds new button one place below button prefab
+                newButton.transform.SetAsFirstSibling();
                 newButton.name = "Vote For Map";
 
                 customMenuButton = newButton.GetComponent<MenuButton>();
@@ -162,7 +164,13 @@ namespace XLMultiMapVote.UI
             Transform maplabelobj = mapVoteUIobj.transform.FindChildRecursively("TextLabelPrefab");
             mapLabelPrefab = maplabelobj.GetComponent<Text>();
         }
-
+        private void AddUIComponents()
+        {
+            if (uiDropDownList != null)
+            {
+                uiDropDownList.template.gameObject.AddComponent<ScrollRectAutoScroll>();
+            }
+        }
         private void SetUpListeners()
         {
             addMapButton.onClick.AddListener(()=> AddMap());
@@ -191,7 +199,7 @@ namespace XLMultiMapVote.UI
 
         private void AddMap()
         {
-            if (uiDropDownList.options.Count <= 0)
+            if (uiDropDownList.options.Count <= 0 || string.IsNullOrEmpty(uiDropDownList.captionText.text) || uiDropDownList.captionText.text.Contains(PopUpLabels.addMapText))
                 return;
 
             Main.multiMapVote.AddMapToOptions(uiDropDownList.captionText.text);
@@ -213,7 +221,7 @@ namespace XLMultiMapVote.UI
 
         private void VoteButton()
         {
-            if (uiDropDownList.options.Count <= 0)
+            if (uiDropDownList.options.Count <= 0 || Main.multiMapVote.popUpOptions.Length <= 0 || !MultiplayerManager.Instance.IsMasterClient)
                 return;
 
             Main.multiMapVote.QueueVote();

@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using GameManagement;
 using Rewired;
 using System.Collections;
+using ModIO.UI;
 
 namespace XLMultiMapVote.Data
 {
@@ -12,8 +13,20 @@ namespace XLMultiMapVote.Data
 	{
 		public override void OnEnter(GameState prevState)
 		{
+            if (!PhotonNetwork.IsMasterClient)
+            {
+				MessageSystem.QueueMessage(MessageDisplayData.Type.Error, "Only room host can set up voting", 2.5f);
+				GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);
+				return;
+			}
+			else if (Main.multiMapVote.isMapchanging)
+            {
+				MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Please wait until current Vote is Complete", 2.5f);
+				GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);
+				return;
+			}
 			//base.OnEnter(prevState);
-
+			//Time.timeScale = 0f;
 			Main.uiController.EnterVoteUI();
 			EventSystem.current.SetSelectedGameObject(null);
 			EventSystem.current.firstSelectedGameObject = Main.uiController.uiDropDownList.gameObject;
