@@ -13,7 +13,7 @@ namespace XLMultiMapVote
     {
         public bool allowPopUps = true;
 
-        public float popUpTime = 10f;
+        public float popUpTime = 0.0f;
 
         public string selectedMap = PopUpLabels.addMapText;
 

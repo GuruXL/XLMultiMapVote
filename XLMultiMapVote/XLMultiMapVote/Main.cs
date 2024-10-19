@@ -7,6 +7,7 @@ using ModIO.UI;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
 using XLMultiMapVote.UI;
+using Photon.Pun;
 
 namespace XLMultiMapVote
 {
@@ -36,7 +37,8 @@ namespace XLMultiMapVote
         }
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
-            if (!multiMapVote.IsInRoom())
+            /*
+            if (!MultiplayerManager.Instance.InRoom)
                 return;
 
             GUILayout.BeginVertical("Box"); // Main Box
@@ -49,7 +51,7 @@ namespace XLMultiMapVote
 
             GUILayout.Space(6);
 
-            if (multiMapVote.IsHost())
+            if (MultiplayerManager.Instance.IsMasterClient)
             {
                 GUILayout.Label("Options");
                 GUILayout.BeginHorizontal();
@@ -116,6 +118,7 @@ namespace XLMultiMapVote
             }
 
             GUILayout.EndVertical(); // main Box
+            */
         }
 
         private static void OnSaveGUI(UnityModManager.ModEntry modEntry)

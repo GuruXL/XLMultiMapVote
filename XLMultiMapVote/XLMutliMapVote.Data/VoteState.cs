@@ -6,6 +6,7 @@ using GameManagement;
 using Rewired;
 using System.Collections;
 using ModIO.UI;
+using MapEditor;
 
 namespace XLMultiMapVote.Data
 {
@@ -15,13 +16,13 @@ namespace XLMultiMapVote.Data
 		{
             if (!PhotonNetwork.IsMasterClient)
             {
-				MessageSystem.QueueMessage(MessageDisplayData.Type.Error, "Only room host can set up voting", 2.5f);
+				MessageSystem.QueueMessage(MessageDisplayData.Type.Error, Labels.hostError, 2.5f);
 				GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);
 				return;
 			}
 			else if (Main.multiMapVote.isMapchanging)
             {
-				MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Please wait until current Vote is Complete", 2.5f);
+				MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.voteInProgressError, 2.5f);
 				GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);
 				return;
 			}
@@ -48,6 +49,10 @@ namespace XLMultiMapVote.Data
 
 		private void CheckForInput()
         {
+            GameState currentState = GameStateMachine.Instance.CurrentState;
+            if (currentState == null || !(currentState is VoteState))
+                return;
+
 			if (RewiredInput.PrimaryPlayer.GetButtonDown("Start"))
 			{
 				GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);

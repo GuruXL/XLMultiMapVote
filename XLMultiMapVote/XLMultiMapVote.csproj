@@ -178,7 +178,7 @@
     <Compile Include="XLMultiMapVote\Settings.cs" />
     <Compile Include="XLMultiMapVote\XLMultiMapVote.cs" />
     <Compile Include="XLMutliMapVote.Data\VoteState.cs" />
-    <Compile Include="XLMutliMapVote.Data\PopUpLabels.cs" />
+    <Compile Include="XLMutliMapVote.Data\Labels.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.json">

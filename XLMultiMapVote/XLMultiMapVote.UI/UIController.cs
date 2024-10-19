@@ -41,6 +41,10 @@ namespace XLMultiMapVote.UI
         private InputField filterMapsInput;
         private InputField timerInput;
 
+        private Canvas MapVoteListCanvas;
+        private CanvasScaler voteListScaler;
+
+
         private void Awake()
         {
             StartCoroutine(CreateCustomUI());
@@ -50,6 +54,7 @@ namespace XLMultiMapVote.UI
         {
             GetButtonPrefab();
             CreateMenuButton();
+            //SetUpCanvasScaler();
         }
 
         private void OnDestroy()
@@ -94,13 +99,13 @@ namespace XLMultiMapVote.UI
                 GameObject newButton = Instantiate(menuButtonPrefab.gameObject, menuButtonPrefab.transform.parent);
                 //newButton.transform.SetSiblingIndex(menuButtonPrefab.gameObject.transform.GetSiblingIndex() + 1); // adds new button one place below button prefab
                 newButton.transform.SetAsFirstSibling();
-                newButton.name = "Vote For Map";
+                newButton.name = Labels.menuButtonLabel;
 
                 customMenuButton = newButton.GetComponent<MenuButton>();
 
                 customMenuButton.GreyedOut = false;
-                customMenuButton.GreyedOutInfoText = "Vote For Map";
-                customMenuButton.Label.SetText("Vote For Map");
+                customMenuButton.GreyedOutInfoText = Labels.menuButtonLabel;
+                customMenuButton.Label.SetText(Labels.menuButtonLabel);
                 customMenuButton.interactable = true;
 
                 customMenuButton.onClick.RemoveAllListeners();  // Remove existing listeners
@@ -163,6 +168,13 @@ namespace XLMultiMapVote.UI
 
             Transform maplabelobj = mapVoteUIobj.transform.FindChildRecursively("TextLabelPrefab");
             mapLabelPrefab = maplabelobj.GetComponent<Text>();
+
+            MapVoteListCanvas = ObjectiveListController.Instance.gameObject.GetComponent<Canvas>();
+            MapVoteListCanvas.sortingOrder = -1; // makes the UI appear behind the voting pop up instead of infront.
+            //ObjectiveListController.Instance.gameObject.SetActive(true);
+
+            voteListScaler = ObjectiveListController.Instance.gameObject.GetComponent<CanvasScaler>();
+            voteListScaler.enabled = false;
         }
         private void AddUIComponents()
         {
@@ -170,6 +182,16 @@ namespace XLMultiMapVote.UI
             {
                 uiDropDownList.template.gameObject.AddComponent<ScrollRectAutoScroll>();
             }
+   
+            //voteListScaler = ObjectiveListController.Instance.gameObject.AddComponent<CanvasScaler>();
+        }
+        private void SetUpCanvasScaler()
+        {
+            voteListScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            voteListScaler.referenceResolution = new Vector2(3840, 2160);
+            voteListScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            voteListScaler.matchWidthOrHeight = 0.5f;
+            voteListScaler.referencePixelsPerUnit = 100f;
         }
         private void SetUpListeners()
         {
@@ -199,7 +221,9 @@ namespace XLMultiMapVote.UI
 
         private void AddMap()
         {
-            if (uiDropDownList.options.Count <= 0 || string.IsNullOrEmpty(uiDropDownList.captionText.text) || uiDropDownList.captionText.text.Contains(PopUpLabels.addMapText))
+            if (uiDropDownList.options.Count <= 0 
+                || string.IsNullOrEmpty(uiDropDownList.captionText.text) 
+                || uiDropDownList.captionText.text.Contains(Labels.addMapText))
                 return;
 
             Main.multiMapVote.AddMapToOptions(uiDropDownList.captionText.text);
@@ -210,7 +234,7 @@ namespace XLMultiMapVote.UI
         {
             Main.multiMapVote.ClearPopUpOptions();
             ClearMapLabels();
-            SetDropDownCaption(PopUpLabels.addMapText);
+            SetDropDownCaption(Labels.addMapText);
         }
 
         private void ExitButton()
@@ -221,7 +245,9 @@ namespace XLMultiMapVote.UI
 
         private void VoteButton()
         {
-            if (uiDropDownList.options.Count <= 0 || Main.multiMapVote.popUpOptions.Length <= 0 || !MultiplayerManager.Instance.IsMasterClient)
+            if (uiDropDownList.options.Count <= 0 
+                || Main.multiMapVote.popUpOptions.Length <= 0 
+                || !MultiplayerManager.Instance.IsMasterClient)
                 return;
 
             Main.multiMapVote.QueueVote();
@@ -248,7 +274,7 @@ namespace XLMultiMapVote.UI
         private void ClearDropDownList()
         {
             uiDropDownList.ClearOptions();
-            SetDropDownCaption(PopUpLabels.addMapText);
+            SetDropDownCaption(Labels.addMapText);
         }
 
         private void SetDropDownCaption(string text)
@@ -290,7 +316,7 @@ namespace XLMultiMapVote.UI
 
         private void CreateMapListLabel(string mapName)
         {
-            if (string.IsNullOrEmpty(mapName) || mapName.Contains(PopUpLabels.addMapText))
+            if (string.IsNullOrEmpty(mapName) || mapName.Contains(Labels.addMapText))
             {
                 return;
             }

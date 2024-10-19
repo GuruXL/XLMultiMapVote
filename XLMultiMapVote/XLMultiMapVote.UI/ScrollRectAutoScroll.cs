@@ -23,6 +23,7 @@ namespace XLMultiMapVote.UI
         {
             if (m_ScrollRect)
             {
+                m_Selectables.Clear();
                 m_ScrollRect.content.GetComponentsInChildren(m_Selectables);
             }
         }
@@ -37,13 +38,14 @@ namespace XLMultiMapVote.UI
         {
             if (m_ScrollRect)
             {
+                m_Selectables.Clear();
                 m_ScrollRect.content.GetComponentsInChildren(m_Selectables);
             }
             ScrollToSelected(true);
         }
         void Update()
         {
-            if (!m_ScrollRect.gameObject.activeSelf)
+            if (!m_ScrollRect || !m_ScrollRect.gameObject.activeSelf)
                 return;
 
             // Scroll via input.
@@ -67,8 +69,7 @@ namespace XLMultiMapVote.UI
             if (m_Selectables.Count > 0)
             {
                 return rePlayer.GetAxis("MoveHorizontal") != 0.0f || rePlayer.GetAxis("MoveVertical") != 0f
-                    || Input.GetAxis("Vertical") != 0.0f || Input.GetAxis("Horizontal") != 0.0f || Input.GetButtonDown("Horizontal")
-                        || Input.GetButtonDown("Vertical") || Input.GetButton("Horizontal") || Input.GetButton("Vertical");
+                    || Input.GetAxis("Vertical") != 0.0f || Input.GetAxis("Horizontal") != 0.0f;
             }
             return false;
         }
@@ -84,14 +85,17 @@ namespace XLMultiMapVote.UI
             }
             if (selectedIndex > -1)
             {
+                float normalizedIndex = 1 - (selectedIndex / ((float)m_Selectables.Count - 1));
+                normalizedIndex = Mathf.Clamp01(normalizedIndex);
+
                 if (quickScroll)
                 {
-                    m_ScrollRect.normalizedPosition = new Vector2(0, 1 - (selectedIndex / ((float)m_Selectables.Count - 1)));
+                    m_ScrollRect.normalizedPosition = new Vector2(0, normalizedIndex);
                     m_NextScrollPosition = m_ScrollRect.normalizedPosition;
                 }
                 else
                 {
-                    m_NextScrollPosition = new Vector2(0, 1 - (selectedIndex / ((float)m_Selectables.Count - 1)));
+                    m_NextScrollPosition = new Vector2(0, normalizedIndex);
                 }
             }
         }

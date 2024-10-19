@@ -6,6 +6,7 @@ using ModIO.UI;
 using UnityEngine.SceneManagement;
 using System;
 using System.Linq;
+using SkaterXL.Data;
 using Photon.Pun;
 using Photon.Realtime;
 using XLMultiMapVote.Data;
@@ -20,36 +21,15 @@ namespace XLMultiMapVote
         public Action<int> popUpCallBack;
 
         //public string[] popUpOptions = new string[] { "Option 0", "Option 1", "Option 2", "Option 3", };
-        public string[] popUpOptions = new string[] {};
+        public string[] popUpOptions = new string[] { };
 
         public Dictionary<int, int> voteIndex = new Dictionary<int, int>();
 
         public VoteState voteState = new VoteState();
 
-        public bool isMapchanging { get; private set; } = false;
+        //public float countDownValue { get; private set; } = 0.0f;
 
-        public bool IsHost()
-        {
-            if (MultiplayerManager.Instance.IsMasterClient)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        public bool IsInRoom()
-        {
-            if (MultiplayerManager.Instance.InRoom)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        public bool isMapchanging { get; private set; } = false;
 
         private void ForEachPlayer(PlayerAction action)
         {
@@ -92,9 +72,9 @@ namespace XLMultiMapVote
             yield return new WaitForSecondsRealtime(Main.settings.popUpTime);
             string votedMap = GetVotedMap();
 
-            if (!String.IsNullOrEmpty(votedMap) || MapHelper.GetMapInfo(votedMap) != null)
+            if (!string.IsNullOrEmpty(votedMap) || MapHelper.GetMapInfo(votedMap) != null)
             {
-                ShowMessage($"Map changing to: { votedMap }", 5f);
+                ShowMessage(Labels.changetoMessage + votedMap, 5f);
                 //LevelManager.Instance.LoadLevel(MapHelper.GetMapInfo(votedMap));
                 LevelManager.Instance.PlayLevel(MapHelper.GetMapInfo(votedMap));
                 ClearPopUpOptions();
@@ -102,8 +82,8 @@ namespace XLMultiMapVote
             }
             else
             {
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Error, "Cannot Change Maps: Map is Invald", 2.5f);
-                Main.Logger.Log("Cannot Change Maps: Map is Invald");
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Error, Labels.invalidMapError, 2.5f);
+                Main.Logger.Log(Labels.invalidMapError);
                 isMapchanging = false;
             }
         }
@@ -186,21 +166,9 @@ namespace XLMultiMapVote
                 return "Option";
             }
         }
-
-        public void StartCountdown(float time)
-        {
-            ForEachPlayer(player => player.ShowCountdown(time));
-        }
-
-        public void ShowMessage(string message, float time)
-        {
-            ForEachPlayer(player => player.ShowMessage(message, time));
-        }
-
-        
         public void AddMapToOptions(string selectedMap)
         {
-            if (string.IsNullOrEmpty(selectedMap) || selectedMap.Contains(PopUpLabels.addMapText))
+            if (string.IsNullOrEmpty(selectedMap) || selectedMap.Contains(Labels.addMapText))
             {
                 return;
             }
@@ -219,9 +187,38 @@ namespace XLMultiMapVote
         }
         public void ClearPopUpOptions()
         {
-            popUpOptions = new string[] {};
+            popUpOptions = new string[] { };
             voteIndex = new Dictionary<int, int>();
         }
+        public void StartCountdown(float time)
+        {
+            ForEachPlayer(player => player.ShowCountdown(time));
+        }
+
+        public void ShowMessage(string message, float time)
+        {
+            ForEachPlayer(player => player.ShowMessage(message, time));
+        }
+
+        public void ShowVoteList(Objective[] votelist)
+        {
+            ForEachPlayer(player => player.ShowObjectivesList(votelist));
+        }
+
+        private Objective[] ConvertVoteList()
+        {
+            string[] votelist = GetVoteList();
+
+            Objective[] objectivelist = new Objective[votelist.Length];
+
+            for (int i = 0; i < votelist.Length; i++)
+            {
+                Objective objective = new Objective();
+                objective.name = votelist[i];
+                objectivelist[i] = objective;
+            }
+            return objectivelist;
+        }   
 
         public void QueueVote()
         {
@@ -230,9 +227,26 @@ namespace XLMultiMapVote
 
             StartCoroutine(ChangeMap());
 
-            ShowPlayerPopUp(PopUpLabels.popUpMessage, true, Main.settings.popUpTime);
-            ShowMessage(PopUpLabels.changeMapMessage, 5f);
+            ShowPlayerPopUp(Labels.popUpMessage, true, Main.settings.popUpTime);
+            ShowMessage(Labels.changeMapMessage, 5f);
             StartCountdown(Main.settings.popUpTime);
+            StartCoroutine(UpdateVoteList());
+        }
+
+        private IEnumerator UpdateVoteList()
+        {
+            float countdown;
+            yield return null;
+
+            if (float.TryParse(CountdownUI.Instance.text.text, out countdown))
+            {
+                while (countdown > 0.0f)
+                {
+                    yield return new WaitForSecondsRealtime(0.5f);
+                    ShowVoteList(ConvertVoteList());
+                    yield return null;
+                }
+            }
         }
     }
 }

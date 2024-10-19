@@ -78,6 +78,7 @@ namespace XLMultiMapVote.Utils
                 return searchWords.All(searchWord => s.ToLower().Contains(searchWord));
             }).ToArray();
         }
+
         /*
         public static string[] FilterArray(string[] filteredStrings, string searchstring)
         {
