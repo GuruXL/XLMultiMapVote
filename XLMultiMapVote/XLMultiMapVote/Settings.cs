@@ -13,9 +13,9 @@ namespace XLMultiMapVote
     {
         public bool allowPopUps = true;
 
-        public float popUpTime = 0.0f;
+        public float popUpTime = 30.0f;
 
-        public string selectedMap = PopUpLabels.addMapText;
+        public string selectedMap = Labels.addMapText;
 
         public string filterString = "";
 

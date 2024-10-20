@@ -11,6 +11,8 @@ using Photon.Pun;
 using Photon.Realtime;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
+using static RootMotion.FinalIK.InteractionObject;
+using System.Threading;
 
 namespace XLMultiMapVote
 {
@@ -31,6 +33,67 @@ namespace XLMultiMapVote
 
         public bool isMapchanging { get; private set; } = false;
 
+        private Coroutine changeMapCoroutine;
+        private Coroutine updateVoteListCoroutine;
+
+        public void StartMapChangeRoutines()
+        {
+            // Start the ChangeMap coroutine and store the reference
+            if (changeMapCoroutine == null)
+            {
+                changeMapCoroutine = StartCoroutine(ChangeMap());
+
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Success, "Change Map Started", 2f);
+            }
+
+            // Start the UpdateVoteList coroutine and store the reference
+            if (updateVoteListCoroutine == null)
+            {
+                updateVoteListCoroutine = StartCoroutine(UpdateVoteList());
+
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Success, "update vote list Started", 2f);
+            }
+        }
+        public void StopMapChangeRoutines()
+        {
+            // Stop ChangeMap if it's running
+            if (changeMapCoroutine != null)
+            {
+                StopCoroutine(changeMapCoroutine);
+                changeMapCoroutine = null; // Set to null so it can be restarted again
+
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Change Map Stopped", 2f);
+            }
+
+            // Stop UpdateVoteList if it's running
+            if (updateVoteListCoroutine != null)
+            {
+                StopCoroutine(updateVoteListCoroutine);
+                updateVoteListCoroutine = null; // Set to null so it can be restarted again
+
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Update Vote List Stopped", 2f);
+            }
+
+        }
+        public void QueueVote()
+        {
+            if (popUpOptions.Length <= 1)
+            {
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.mapListEmptyError, 1.5f);
+                return;
+            }
+            if (isMapchanging) return;
+
+            //StartCoroutine(ChangeMap());
+            //StartCoroutine(UpdateVoteList());
+
+            StartMapChangeRoutines();
+
+            ShowPlayerPopUp(Labels.popUpMessage, true, Main.settings.popUpTime);
+            ShowMessage(Labels.changeMapMessage, 5f);
+            StartCountdown(Main.settings.popUpTime);
+
+        }
         private void ForEachPlayer(PlayerAction action)
         {
             foreach (KeyValuePair<int, NetworkPlayerController> entry in MultiplayerManager.Instance.networkPlayers)
@@ -65,29 +128,72 @@ namespace XLMultiMapVote
                 voteIndex[i] = 0; // Initialize all vote counts to 0
             }
         }
+
         public IEnumerator ChangeMap()
         {
             isMapchanging = true;
-            //yield return new WaitForSeconds(Main.settings.popUpTime);
-            yield return new WaitForSecondsRealtime(Main.settings.popUpTime);
-            string votedMap = GetVotedMap();
 
-            if (!string.IsNullOrEmpty(votedMap) || MapHelper.GetMapInfo(votedMap) != null)
+            yield return new WaitForSecondsRealtime(Main.settings.popUpTime);
+
+            string votedMap = GetVotedMap();
+            LevelInfo mapInfo = MapHelper.GetMapInfo(votedMap);
+
+            if (!string.IsNullOrEmpty(votedMap) || mapInfo != null || !isMapchanging)
             {
                 ShowMessage(Labels.changetoMessage + votedMap, 5f);
                 //LevelManager.Instance.LoadLevel(MapHelper.GetMapInfo(votedMap));
                 LevelManager.Instance.PlayLevel(MapHelper.GetMapInfo(votedMap));
                 ClearPopUpOptions();
-                isMapchanging = false;
             }
             else
             {
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Error, Labels.invalidMapError, 2.5f);
                 Main.Logger.Log(Labels.invalidMapError);
-                isMapchanging = false;
             }
+
+            isMapchanging = false;
         }
 
+        private string GetVotedMap()
+        {
+            if (voteIndex.Count == 0)
+            {
+                return null; // No votes have been cast
+            }
+
+            int maxVotes = int.MinValue;
+            List<int> tiedOptions = new List<int>();
+
+            // Use a single pass to collect options with the maximum votes
+            foreach (var pair in voteIndex)
+            {
+                if (pair.Value > maxVotes)
+                {
+                    // New maximum found, reset the list
+                    maxVotes = pair.Value;
+                    tiedOptions.Clear();
+                    tiedOptions.Add(pair.Key);
+                }
+                else if (pair.Value == maxVotes)
+                {
+                    // Add to tied options list
+                    tiedOptions.Add(pair.Key);
+                }
+            }
+
+            if (tiedOptions.Count == 1)
+            {
+                int chosenIndex = tiedOptions[0];
+                if (chosenIndex >= 0 && chosenIndex < popUpOptions.Length)
+                {
+                    return popUpOptions[chosenIndex];
+                }
+            }
+
+            // Handle the tie case by using the existing method
+            return MapHelper.ChooseMapOnTie(voteIndex, popUpOptions);
+        }
+        /* GetVotedMap() old version
         private string GetVotedMap()
         {
             if (voteIndex.Count == 0)
@@ -109,25 +215,65 @@ namespace XLMultiMapVote
                     return popUpOptions[votedOptions[0]];
                 }
             }
-            else if (votedOptions.Count > 1) // A tie exists
+            else if (votedOptions.Count > 1) // handle tied vote
             {
                 return ChooseMapOnTie(voteIndex, popUpOptions);
             }
 
             return null;
         }
-        public string ChooseMapOnTie(Dictionary<int, int> voteIndex, string[] mapOptions)
+        */
+
+        public void CancelVote(bool overNetwork)
         {
-            // This function assumes there is already a tie and doesn't check it by itself
-            int maxVotes = voteIndex.Values.Max();
-            var tiedOptions = voteIndex.Where(pair => pair.Value == maxVotes).Select(pair => pair.Key).ToList();
-
-            int randomIndex = UnityEngine.Random.Range(0, tiedOptions.Count);
-            int chosenOptionIndex = tiedOptions[randomIndex];
-
-            return mapOptions[chosenOptionIndex];
+            if (overNetwork)
+            {
+                CancelMapChangeOverNetwork();
+                CancelMapChangeForSelf();
+            }
+            else
+            {
+                CancelMapChangeForSelf();
+            }
         }
 
+        private void CancelMapChangeOverNetwork()
+        {
+            Objective[] blanklist = new Objective[0];
+            ShowVoteList(blanklist);
+            StopCountdown();
+            ShowMessage(Labels.voteCancelError, 5f);
+            ShowPlayerPopUp("", false, -1);
+
+        }
+        private void CancelMapChangeForSelf()
+        {
+            StopMapChangeRoutines();
+            CountdownUI.Instance.StopCountdown();
+            ObjectiveListController.Instance.Hide();
+            ResetPopupsLocally();
+
+            isMapchanging = false;
+
+            MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"Voting cancelled", 2.5f); // remove later
+        }
+        private void ResetPopupsLocally()
+        {
+            ClearPopUpOptions();
+            MultiplayerManager.Instance.gameModePopup.gameObject.SetActive(false);
+            if (!InputController.Instance.controlsActive)
+            {
+                InputController.Instance.controlsActive = true;
+            }
+
+            // Declare a blank callback action
+            //Action<string, int> blankCallback = (string s, int i) => { };
+            //string[] blankOptions = new string[1]
+            //{
+            //    "Close",
+            //};
+            //MultiplayerManager.Instance.gameModePopup.ShowPopup("blank", "", blankOptions, blankCallback, false);
+        }
         public void ShowPlayerPopUp(string message, bool pauseGame, float time)
         {
             HandlePopUpCallBack(); // initializes the call back and records the players answer.
@@ -141,7 +287,7 @@ namespace XLMultiMapVote
         private void HandlePopUpCallBack()
         {
             popUpCallBack = (optionIndex) => {
-                // Handle the selected option here
+                //Handle the selected option here
                 //Main.Logger.Log($"{GetOptionName(optionIndex)} Selected");
                 //MessageSystem.QueueMessage(MessageDisplayData.Type.Info, $"option {optionIndex} Selected", 2.5f);
                 LogPlayerChoice(optionIndex);
@@ -194,7 +340,11 @@ namespace XLMultiMapVote
         {
             ForEachPlayer(player => player.ShowCountdown(time));
         }
-
+        public void StopCountdown()
+        {
+            ForEachPlayer(player => player.ShowCountdown(0.1f));
+        }
+       
         public void ShowMessage(string message, float time)
         {
             ForEachPlayer(player => player.ShowMessage(message, time));
@@ -219,20 +369,6 @@ namespace XLMultiMapVote
             }
             return objectivelist;
         }   
-
-        public void QueueVote()
-        {
-            if (isMapchanging || popUpOptions.Length <= 1)
-                return;
-
-            StartCoroutine(ChangeMap());
-
-            ShowPlayerPopUp(Labels.popUpMessage, true, Main.settings.popUpTime);
-            ShowMessage(Labels.changeMapMessage, 5f);
-            StartCountdown(Main.settings.popUpTime);
-            StartCoroutine(UpdateVoteList());
-        }
-
         private IEnumerator UpdateVoteList()
         {
             float countdown;

@@ -127,6 +127,38 @@ namespace XLMultiMapVote
         }
         private static bool OnToggle(UnityModManager.ModEntry modEntry, bool value)
         {
+            if (enabled == value)
+                return true;  // return immediately
+
+            enabled = value;
+
+            if (enabled)
+            {
+                harmonyInstance = new Harmony(modEntry.Info.Id);
+                harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
+
+                ScriptManager = new GameObject("XLMultiMapVote");
+                multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
+                uiController = ScriptManager.AddComponent<UIController>();
+                Object.DontDestroyOnLoad(ScriptManager);
+
+                AssetLoader.LoadBundles();
+            }
+            else
+            {
+                harmonyInstance.UnpatchAll(harmonyInstance.Id);
+                AssetLoader.UnloadAssetBundle();
+                if (ScriptManager != null)  // Ensure ScriptManager exists before trying to destroy it
+                {
+                    Object.Destroy(ScriptManager);
+                }
+            }
+
+            return true;  // Always return true when successful
+        }
+        /* OnToggle() old version
+        private static bool OnToggle(UnityModManager.ModEntry modEntry, bool value)
+        {
             bool flag;
             if (enabled == value)
             {
@@ -156,6 +188,7 @@ namespace XLMultiMapVote
             }
             return flag;
         }
+        */
         public static bool Unload(UnityModManager.ModEntry modEntry)
         {
             harmonyInstance.UnpatchAll(harmonyInstance.Id);

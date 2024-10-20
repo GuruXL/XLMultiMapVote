@@ -143,7 +143,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="XLMultiMapVote.Patches\MultiplayerMenuPatch.cs" />
+    <Compile Include="XLMultiMapVote.Patches\OnLeftRoomPatch.cs" />
+    <Compile Include="XLMultiMapVote.Patches\OnEnableMenuPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
     <Compile Include="XLMultiMapVote.UI\ScrollRectAutoScroll.cs" />
     <Compile Include="XLMultiMapVote.UI\UIController.cs" />

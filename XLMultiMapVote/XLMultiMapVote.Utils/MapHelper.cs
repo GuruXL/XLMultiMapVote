@@ -78,8 +78,7 @@ namespace XLMultiMapVote.Utils
                 return searchWords.All(searchWord => s.ToLower().Contains(searchWord));
             }).ToArray();
         }
-
-        /*
+        /* FilterArray() old version
         public static string[] FilterArray(string[] filteredStrings, string searchstring)
         {
             string[] searchWords = searchstring.ToLower().Split(' ');
@@ -97,6 +96,48 @@ namespace XLMultiMapVote.Utils
                 }
                 return containsAllWords;
             }).ToArray();
+        }
+        */
+
+        public static string ChooseMapOnTie(Dictionary<int, int> voteIndex, string[] mapOptions)
+        {
+            // collect tied values
+            int maxVotes = int.MinValue;
+            List<int> tiedOptions = new List<int>();
+
+            foreach (var pair in voteIndex)
+            {
+                if (pair.Value > maxVotes)
+                {
+                    // New maximum found, reset the tied list
+                    maxVotes = pair.Value;
+                    tiedOptions.Clear();
+                    tiedOptions.Add(pair.Key);
+                }
+                else if (pair.Value == maxVotes)
+                {
+                    // Add to the list of tied options
+                    tiedOptions.Add(pair.Key);
+                }
+            }
+
+            // Randomly choose one of the tied options
+            int randomIndex = Random.Range(0, tiedOptions.Count);
+            int chosenOptionIndex = tiedOptions[randomIndex];
+
+            return mapOptions[chosenOptionIndex];
+        }
+        /* ChooseMapOnTie() old version
+        public string ChooseMapOnTie(Dictionary<int, int> voteIndex, string[] mapOptions)
+        {
+            // This function assumes there is already a tie and doesn't check it by itself
+            int maxVotes = voteIndex.Values.Max();
+            var tiedOptions = voteIndex.Where(pair => pair.Value == maxVotes).Select(pair => pair.Key).ToList();
+
+            int randomIndex = UnityEngine.Random.Range(0, tiedOptions.Count);
+            int chosenOptionIndex = tiedOptions[randomIndex];
+
+            return mapOptions[chosenOptionIndex];
         }
         */
     }

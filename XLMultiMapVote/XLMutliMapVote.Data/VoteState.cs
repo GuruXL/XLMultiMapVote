@@ -26,21 +26,18 @@ namespace XLMultiMapVote.Data
 				GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);
 				return;
 			}
-			//base.OnEnter(prevState);
-			//Time.timeScale = 0f;
-			Main.uiController.EnterVoteUI();
-			EventSystem.current.SetSelectedGameObject(null);
-			EventSystem.current.firstSelectedGameObject = Main.uiController.uiDropDownList.gameObject;
-			EventSystem.current.SetSelectedGameObject(Main.uiController.uiDropDownList.gameObject);
-		}
+
+            Main.uiController.EnterVoteUI();
+
+            base.OnEnter(prevState);
+        }
 
 		public override void OnExit(GameState nextState)
 		{
-			//base.OnExit(nextState);
+            Main.uiController.ExitVoteUI();
 
-			Main.uiController.ExitVoteUI();
-			EventSystem.current.SetSelectedGameObject(null);
-		}
+            base.OnExit(nextState);
+        }
 
 		public override void OnUpdate()
 		{
