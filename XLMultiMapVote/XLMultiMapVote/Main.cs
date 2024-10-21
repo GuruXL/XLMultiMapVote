@@ -7,6 +7,7 @@ using ModIO.UI;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
 using XLMultiMapVote.UI;
+using XLMultiMapVote.Utils;
 using Photon.Pun;
 
 namespace XLMultiMapVote
@@ -20,6 +21,7 @@ namespace XLMultiMapVote
         public static UnityModManager.ModEntry modEntry;
         public static Settings settings;
         public static GameObject ScriptManager;
+        public static SceneChangeManager sceneChangeManager;
         public static XLMultiMapVote multiMapVote;
         public static UIController uiController;
 
@@ -138,6 +140,7 @@ namespace XLMultiMapVote
                 harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
 
                 ScriptManager = new GameObject("XLMultiMapVote");
+                sceneChangeManager = ScriptManager.AddComponent<SceneChangeManager>();
                 multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
                 uiController = ScriptManager.AddComponent<UIController>();
                 Object.DontDestroyOnLoad(ScriptManager);

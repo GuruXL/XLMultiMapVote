@@ -7,13 +7,29 @@ namespace XLMultiMapVote.Utils
 {
     public static class MapHelper
     {
-        //private static List<LevelInfo> LevelList;
-        //private static List<LevelInfo> ModLevelList;
-        //private static List<LevelInfo> CommunityLevelList;
-
+        // Existing map lists
         public static List<LevelInfo> combinedMapList = new List<LevelInfo>();
         public static string[] mapNames;
 
+        // Properties to track current and last LevelInfo
+        public static LevelInfo currentLevelInfo { get; set; }
+        public static LevelInfo nextLevelInfo { get; set; }
+        // Utility to check if the map has changed
+        public static bool HasMapChanged()
+        {
+            return nextLevelInfo != null && currentLevelInfo == nextLevelInfo;
+        }
+
+        // Method to update current level
+        public static void SetCurrentLevel()
+        {
+            if (currentLevelInfo != nextLevelInfo)
+            {
+                currentLevelInfo = nextLevelInfo;
+            }
+        }
+
+        // Method to get map info by name
         public static LevelInfo GetMapInfo(string votedMap)
         {
             if (combinedMapList?.Count > 0)
@@ -29,10 +45,11 @@ namespace XLMultiMapVote.Utils
             return null;
         }
 
+        // Get combined list of all maps
         public static List<LevelInfo> GetMaps()
         {
             combinedMapList.Clear();
-            
+
             if (LevelManager.Instance.Levels != null)
             {
                 combinedMapList.AddRange(LevelManager.Instance.Levels.ToList());
@@ -49,23 +66,26 @@ namespace XLMultiMapVote.Utils
             return combinedMapList;
         }
 
-        public static string [] GetMapNames()
+        // Get names of maps as a string array
+        public static string[] GetMapNames()
         {
-            mapNames = new string[] { };
             mapNames = ConvertToString(GetMaps());
             return mapNames;
         }
 
+        // Convert LevelInfo list to string names
         public static string[] ConvertToString(List<LevelInfo> info)
         {
             string[] names = new string[info.Count];
 
-            for(int i = 0; i < info.Count; i++)
+            for (int i = 0; i < info.Count; i++)
             {
                 names[i] = info[i].name;
             }
             return names;
         }
+
+        // Filter map names based on a search string
         public static string[] FilterArray(string[] mapNames, string searchString)
         {
             // Split the search string into lowercase words
@@ -78,30 +98,11 @@ namespace XLMultiMapVote.Utils
                 return searchWords.All(searchWord => s.ToLower().Contains(searchWord));
             }).ToArray();
         }
-        /* FilterArray() old version
-        public static string[] FilterArray(string[] filteredStrings, string searchstring)
-        {
-            string[] searchWords = searchstring.ToLower().Split(' ');
 
-            return filteredStrings = mapNames.Where(s =>
-            {
-                bool containsAllWords = true;
-                foreach (string searchWord in searchWords)
-                {
-                    if (!s.ToLower().Contains(searchWord))
-                    {
-                        containsAllWords = false;
-                        break;
-                    }
-                }
-                return containsAllWords;
-            }).ToArray();
-        }
-        */
-
+        // Choose a map on a tie from vote index and options
         public static string ChooseMapOnTie(Dictionary<int, int> voteIndex, string[] mapOptions)
         {
-            // collect tied values
+            // Collect tied values
             int maxVotes = int.MinValue;
             List<int> tiedOptions = new List<int>();
 
@@ -127,18 +128,5 @@ namespace XLMultiMapVote.Utils
 
             return mapOptions[chosenOptionIndex];
         }
-        /* ChooseMapOnTie() old version
-        public string ChooseMapOnTie(Dictionary<int, int> voteIndex, string[] mapOptions)
-        {
-            // This function assumes there is already a tie and doesn't check it by itself
-            int maxVotes = voteIndex.Values.Max();
-            var tiedOptions = voteIndex.Where(pair => pair.Value == maxVotes).Select(pair => pair.Key).ToList();
-
-            int randomIndex = UnityEngine.Random.Range(0, tiedOptions.Count);
-            int chosenOptionIndex = tiedOptions[randomIndex];
-
-            return mapOptions[chosenOptionIndex];
-        }
-        */
     }
 }

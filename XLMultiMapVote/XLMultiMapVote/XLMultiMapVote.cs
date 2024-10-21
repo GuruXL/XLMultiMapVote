@@ -1,18 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using GameManagement;
 using ModIO.UI;
-using UnityEngine.SceneManagement;
 using System;
-using System.Linq;
 using SkaterXL.Data;
-using Photon.Pun;
-using Photon.Realtime;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
-using static RootMotion.FinalIK.InteractionObject;
-using System.Threading;
+
 
 namespace XLMultiMapVote
 {
@@ -70,7 +64,7 @@ namespace XLMultiMapVote
             {
                 StopCoroutine(updateVoteListCoroutine);
                 updateVoteListCoroutine = null; // Set to null so it can be restarted again
-
+            
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Update Vote List Stopped", 2f);
             }
 
@@ -82,16 +76,18 @@ namespace XLMultiMapVote
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.mapListEmptyError, 1.5f);
                 return;
             }
-            if (isMapchanging) return;
+            if (isMapchanging) return; // return if map change is already queued
+
+            isMapchanging = true;
 
             //StartCoroutine(ChangeMap());
             //StartCoroutine(UpdateVoteList());
 
-            StartMapChangeRoutines();
-
             ShowPlayerPopUp(Labels.popUpMessage, true, Main.settings.popUpTime);
             ShowMessage(Labels.changeMapMessage, 5f);
             StartCountdown(Main.settings.popUpTime);
+
+            StartMapChangeRoutines();
 
         }
         private void ForEachPlayer(PlayerAction action)
@@ -131,27 +127,29 @@ namespace XLMultiMapVote
 
         public IEnumerator ChangeMap()
         {
-            isMapchanging = true;
+            //isMapchanging = true;
 
             yield return new WaitForSecondsRealtime(Main.settings.popUpTime);
 
             string votedMap = GetVotedMap();
-            LevelInfo mapInfo = MapHelper.GetMapInfo(votedMap);
+            MapHelper.nextLevelInfo = MapHelper.GetMapInfo(votedMap);
 
-            if (!string.IsNullOrEmpty(votedMap) || mapInfo != null || !isMapchanging)
+            if (!string.IsNullOrEmpty(votedMap) && MapHelper.nextLevelInfo != null && isMapchanging)
             {
                 ShowMessage(Labels.changetoMessage + votedMap, 5f);
-                //LevelManager.Instance.LoadLevel(MapHelper.GetMapInfo(votedMap));
-                LevelManager.Instance.PlayLevel(MapHelper.GetMapInfo(votedMap));
+                // LevelManager.Instance.LoadLevel(mapInfo);
+                LevelManager.Instance.PlayLevel(MapHelper.nextLevelInfo);
                 ClearPopUpOptions();
             }
             else
             {
+                // Handle invalid map error
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Error, Labels.invalidMapError, 2.5f);
                 Main.Logger.Log(Labels.invalidMapError);
             }
 
             isMapchanging = false;
+            yield return null;
         }
 
         private string GetVotedMap()
@@ -228,13 +226,15 @@ namespace XLMultiMapVote
         {
             if (overNetwork)
             {
-                CancelMapChangeOverNetwork();
                 CancelMapChangeForSelf();
+                CancelMapChangeOverNetwork();
             }
             else
             {
                 CancelMapChangeForSelf();
             }
+
+            isMapchanging = false;
         }
 
         private void CancelMapChangeOverNetwork()
@@ -248,12 +248,10 @@ namespace XLMultiMapVote
         }
         private void CancelMapChangeForSelf()
         {
-            StopMapChangeRoutines();
-            CountdownUI.Instance.StopCountdown();
             ObjectiveListController.Instance.Hide();
+            CountdownUI.Instance.StopCountdown();
+            StopMapChangeRoutines();
             ResetPopupsLocally();
-
-            isMapchanging = false;
 
             MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"Voting cancelled", 2.5f); // remove later
         }
@@ -368,21 +366,29 @@ namespace XLMultiMapVote
                 objectivelist[i] = objective;
             }
             return objectivelist;
-        }   
+        }
         private IEnumerator UpdateVoteList()
         {
             float countdown;
-            yield return null;
 
+            // Attempt to parse the countdown value initially
             if (float.TryParse(CountdownUI.Instance.text.text, out countdown))
             {
                 while (countdown > 0.0f)
                 {
                     yield return new WaitForSecondsRealtime(0.5f);
+
+                    if (!float.TryParse(CountdownUI.Instance.text.text, out countdown))
+                    {
+                        yield break;
+                    }
                     ShowVoteList(ConvertVoteList());
-                    yield return null;
+
+                    yield return null; // This allows the loop to be more responsive
                 }
             }
+
+            yield return null;
         }
     }
 }
