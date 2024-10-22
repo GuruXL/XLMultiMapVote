@@ -39,8 +39,7 @@ namespace XLMultiMapVote
         }
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
-            /*
-            if (!MultiplayerManager.Instance.InRoom)
+            if (!PhotonNetwork.IsConnected && !PhotonNetwork.InRoom)
                 return;
 
             GUILayout.BeginVertical("Box"); // Main Box
@@ -48,9 +47,18 @@ namespace XLMultiMapVote
             GUILayout.BeginHorizontal();
             RGUI.BeginBackgroundColor(Color.white);
             settings.allowPopUps = GUILayout.Toggle(settings.allowPopUps, "Allow PopUps", GUILayout.Width(128));
+            GUILayout.Space(6);
+            if (GUILayout.Button("Clear UI", RGUIStyle.button, GUILayout.Width(128)))
+            {
+                multiMapVote.CancelVote(false);
+            }
             RGUI.EndBackgroundColor();
             GUILayout.EndHorizontal();
 
+
+            GUILayout.EndVertical(); // main Box
+
+            /*
             GUILayout.Space(6);
 
             if (MultiplayerManager.Instance.IsMasterClient)

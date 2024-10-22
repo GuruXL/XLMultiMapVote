@@ -21,7 +21,7 @@ namespace XLMultiMapVote.Utils
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (!PhotonNetwork.IsConnected && !PhotonNetwork.InRoom) 
+            if (!PhotonNetwork.IsConnected && !PhotonNetwork.InRoom)
             {
                 return;
             }

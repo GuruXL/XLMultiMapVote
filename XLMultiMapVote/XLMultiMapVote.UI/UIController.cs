@@ -29,18 +29,22 @@ namespace XLMultiMapVote.UI
         public MenuButton cancelVoteButton;
 
         // UI Elements
-        public Dropdown uiDropDownList;
-        public Text mapLabelPrefab;
-
-        public List<Text> mapLabelList = new List<Text>();
+        //public Dropdown uiDropDownList;
+        public TMP_Dropdown uiDropDownList;
+        //public Text mapLabelPrefab;
+        public TextMeshProUGUI mapLabelPrefab;
+        public List<TextMeshProUGUI> mapLabelList = new List<TextMeshProUGUI>();
 
         private Button addMapButton;
         private Button clearMapButton;
         private Button voteButton;
         private Button exitButton;
 
-        private InputField filterMapsInput;
-        private InputField timerInput;
+        //private InputField filterMapsInput;
+        //private InputField timerInput;
+
+        private TMP_InputField filterMapsInput;
+        private TMP_InputField timerInput;
 
         private Canvas MapVoteListCanvas;
         private CanvasScaler voteListScaler;
@@ -218,16 +222,20 @@ namespace XLMultiMapVote.UI
             exitButton = exitobj.GetComponent<Button>();
 
             Transform filterobj = mapVoteUIobj.transform.FindChildRecursively("InputField_FilterMap");
-            filterMapsInput = filterobj.GetComponent<InputField>();
+            //filterMapsInput = filterobj.GetComponent<InputField>();
+            filterMapsInput = filterobj.GetComponent<TMP_InputField>();
 
             Transform timerobj = mapVoteUIobj.transform.FindChildRecursively("InputField_PopupTime");
-            timerInput = timerobj.GetComponent<InputField>();
+            //timerInput = timerobj.GetComponent<InputField>();
+            timerInput = timerobj.GetComponent<TMP_InputField>();
 
             Transform dropdownobj = mapVoteUIobj.transform.FindChildRecursively("MapListDropDown");
-            uiDropDownList = dropdownobj.GetComponent<Dropdown>();
+            //uiDropDownList = dropdownobj.GetComponent<Dropdown>();
+            uiDropDownList = dropdownobj.GetComponent<TMP_Dropdown>();
 
             Transform maplabelobj = mapVoteUIobj.transform.FindChildRecursively("TextLabelPrefab");
-            mapLabelPrefab = maplabelobj.GetComponent<Text>();
+            //mapLabelPrefab = maplabelobj.GetComponent<Text>();
+            mapLabelPrefab = maplabelobj.GetComponent<TextMeshProUGUI>();
 
             MapVoteListCanvas = ObjectiveListController.Instance.gameObject.GetComponent<Canvas>();
             MapVoteListCanvas.sortingOrder = -1; // makes the UI appear behind the voting pop up instead of infront.
@@ -242,7 +250,16 @@ namespace XLMultiMapVote.UI
             {
                 uiDropDownList.template.gameObject.AddComponent<ScrollRectAutoScroll>();
             }
-   
+
+            bool componentadded = uiDropDownList.template.gameObject.GetComponent<ScrollRectAutoScroll>();
+            if (componentadded)
+            {
+                Main.Logger.Log("ScrollRectAutoScroll Added");
+            }
+            else
+            {
+                Main.Logger.Log("Failed to add ScrollRectAutoScroll");
+            }
             //voteListScaler = ObjectiveListController.Instance.gameObject.AddComponent<CanvasScaler>();
         }
         private void SetUpCanvasScaler()
@@ -321,12 +338,12 @@ namespace XLMultiMapVote.UI
 
         private void PopulateDropDownList()
         {
-            List<Dropdown.OptionData> dropdownlist = new List<Dropdown.OptionData>();
+            List<TMP_Dropdown.OptionData> dropdownlist = new List<TMP_Dropdown.OptionData>();
             string[] mapList = FilterMaps();
 
             for (int i = 0; i < mapList.Length; i++)
             {
-                Dropdown.OptionData data = new Dropdown.OptionData();
+                TMP_Dropdown.OptionData data = new TMP_Dropdown.OptionData();
                 data.text = mapList[i];
                 dropdownlist.Add(data); // Add the new option to the list
             }
@@ -379,6 +396,30 @@ namespace XLMultiMapVote.UI
                 return;
             }
 
+
+            foreach (TextMeshProUGUI label in mapLabelList)
+            {
+                if (label.text == mapName)
+                {
+                    return; // skip creation if new label is a duplicate.
+                }
+            }
+
+            GameObject newListObj = Instantiate(mapLabelPrefab.gameObject, mapLabelPrefab.gameObject.transform.parent);
+            newListObj.SetActive(true);
+            TextMeshProUGUI newListItem = newListObj.GetComponent<TextMeshProUGUI>();
+            newListItem.text = mapName;
+            newListItem.name = mapName;
+            mapLabelList.Add(newListItem);
+        }
+        /* old version new on need for TMP
+        private void CreateMapListLabel(string mapName)
+        {
+            if (string.IsNullOrEmpty(mapName) || mapName.Contains(Labels.addMapText))
+            {
+                return;
+            }
+
             foreach (Text label in mapLabelList)
             {
                 if (label.text == mapName)
@@ -394,6 +435,7 @@ namespace XLMultiMapVote.UI
             newListItem.name = mapName;
             mapLabelList.Add(newListItem);
         }
+        */
 
         private void ClearMapLabels()
         {
@@ -401,7 +443,7 @@ namespace XLMultiMapVote.UI
         }
         private IEnumerator DestroyLabelObjects()
         {
-            foreach (Text item in mapLabelList)
+            foreach (TextMeshProUGUI item in mapLabelList)
             {
                 item.gameObject.SetActive(false);
                 Destroy(item.gameObject);

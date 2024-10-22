@@ -45,7 +45,7 @@ namespace XLMultiMapVote
             {
                 updateVoteListCoroutine = StartCoroutine(UpdateVoteList());
 
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Success, "update vote list Started", 2f);
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Success, "Update Vote List Started", 2f);
             }
         }
         public void StopMapChangeRoutines()
@@ -136,7 +136,7 @@ namespace XLMultiMapVote
 
             if (!string.IsNullOrEmpty(votedMap) && MapHelper.nextLevelInfo != null && isMapchanging)
             {
-                ShowMessage(Labels.changetoMessage + votedMap, 5f);
+                ShowMessage(Labels.changetoMessage + votedMap, 3f);
                 // LevelManager.Instance.LoadLevel(mapInfo);
                 LevelManager.Instance.PlayLevel(MapHelper.nextLevelInfo);
                 ClearPopUpOptions();
@@ -226,8 +226,8 @@ namespace XLMultiMapVote
         {
             if (overNetwork)
             {
-                CancelMapChangeForSelf();
                 CancelMapChangeOverNetwork();
+                CancelMapChangeForSelf();
             }
             else
             {
@@ -241,37 +241,27 @@ namespace XLMultiMapVote
         {
             Objective[] blanklist = new Objective[0];
             ShowVoteList(blanklist);
-            StopCountdown();
+            ShowPlayerPopUp(Labels.voteCancelError, false, 2f);
             ShowMessage(Labels.voteCancelError, 5f);
-            ShowPlayerPopUp("", false, -1);
-
+            StopCountdown();
         }
         private void CancelMapChangeForSelf()
         {
+            ClearPopUpOptions();
+            StopMapChangeRoutines();
+
             ObjectiveListController.Instance.Hide();
             CountdownUI.Instance.StopCountdown();
-            StopMapChangeRoutines();
-            ResetPopupsLocally();
-
-            MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"Voting cancelled", 2.5f); // remove later
-        }
-        private void ResetPopupsLocally()
-        {
-            ClearPopUpOptions();
             MultiplayerManager.Instance.gameModePopup.gameObject.SetActive(false);
-            if (!InputController.Instance.controlsActive)
+
+            if (!InputController.Instance.controlsActive) // OnDisable is not being called on gameModePopup, This is Temp fix for frozen player controls
             {
                 InputController.Instance.controlsActive = true;
             }
 
-            // Declare a blank callback action
-            //Action<string, int> blankCallback = (string s, int i) => { };
-            //string[] blankOptions = new string[1]
-            //{
-            //    "Close",
-            //};
-            //MultiplayerManager.Instance.gameModePopup.ShowPopup("blank", "", blankOptions, blankCallback, false);
+            //MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"Voting cancelled", 1.5f); // remove later
         }
+
         public void ShowPlayerPopUp(string message, bool pauseGame, float time)
         {
             HandlePopUpCallBack(); // initializes the call back and records the players answer.
@@ -331,8 +321,10 @@ namespace XLMultiMapVote
         }
         public void ClearPopUpOptions()
         {
-            popUpOptions = new string[] { };
-            voteIndex = new Dictionary<int, int>();
+            //popUpOptions = new string[] { };
+            //voteIndex = new Dictionary<int, int>();
+            popUpOptions = Array.Empty<string>();
+            voteIndex.Clear();
         }
         public void StartCountdown(float time)
         {

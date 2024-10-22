@@ -16,6 +16,9 @@ namespace XLMultiMapVote.Patches
 
         public static void Postfix(MultiplayerMainMenu __instance)
         {
+            if (!PhotonNetwork.IsConnected)
+                return;
+
             if (PhotonNetwork.InRoom && !PhotonNetwork.IsMasterClient)
             {
                 if (menuButton.gameObject.activeSelf)
@@ -41,34 +44,9 @@ namespace XLMultiMapVote.Patches
                 }
             }
 
-            MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $" OnEnableMenu Patch has Run", 2.0f);
+            //MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $" OnEnableMenu Patch has Run", 2.0f);
         }
     }
-
-    /*
-    [HarmonyPatch(typeof(MultiplayerMainMenu))]
-    [HarmonyPatch("OnJoinedRoom")]
-    public static class OnJoinedRoomMenuPatch
-    {
-        private static MenuButton menuButton = Main.uiController.customMenuButton;
-        public static void Postfix(MultiplayerMainMenu __instance)
-        {
-            if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom != null && PhotonNetwork.IsMasterClient)
-            {
-                if (!menuButton.gameObject.activeSelf)
-                {
-                    menuButton.gameObject.SetActive(true);
-                }
-            }
-            else if (!PhotonNetwork.IsMasterClient && menuButton.gameObject.activeSelf)
-            {
-                menuButton.gameObject.SetActive(false);
-            }
-
-            MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $" OnJoinedRoomMenu Patch has Run", 2.0f);
-        }
-    }
-    */
 
     [HarmonyPatch(typeof(MultiplayerMainMenu))]
     [HarmonyPatch("OnLeftRoom")]
@@ -86,8 +64,6 @@ namespace XLMultiMapVote.Patches
             {
                 cancelButton.gameObject.SetActive(false);
             }
-
-            MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $" OnLeftRoomMenu Patch has Run", 2.0f);
         }
     }
 }
