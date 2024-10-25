@@ -7,13 +7,15 @@ using ModIO.UI;
 
 namespace XLMultiMapVote.Patches
 {
+    
     [HarmonyPatch(typeof(MultiplayerManager))]
     [HarmonyPatch("OnLeftRoom")]
     class OnLeftRoomPatch
     {
         public static void Postfix()
         {
-            if(!Main.multiMapVote.isMapchanging)
+
+            if (!Main.multiMapVote.isMapchanging)
                 return;
 
             if (PhotonNetwork.IsMasterClient)
@@ -32,4 +34,5 @@ namespace XLMultiMapVote.Patches
             MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"OnLeftRoom Patch Has Run", 2.0f);
         }
     }
+    
 }

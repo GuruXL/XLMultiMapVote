@@ -7,7 +7,9 @@
 
         public const string changeMapMessage = "Voting in progress... The map will change when the timer ends.";
 
-        public const string changetoMessage = "Map changing to: "; 
+        public const string changetoMessage = "Map changing to: ";
+
+        public const string tiedMapMessage = "There has been a Tie! A random map will be choosen from the winners.";
 
         // UI
         public const string addMapText = "Select Map To Add";

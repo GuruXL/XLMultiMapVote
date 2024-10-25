@@ -46,7 +46,7 @@ namespace XLMultiMapVote.Utils
         }
 
         // Get combined list of all maps
-        public static List<LevelInfo> GetMaps()
+        private static List<LevelInfo> GetMaps()
         {
             combinedMapList.Clear();
 
@@ -67,14 +67,14 @@ namespace XLMultiMapVote.Utils
         }
 
         // Get names of maps as a string array
-        public static string[] GetMapNames()
+        private static string[] GetMapNames()
         {
             mapNames = ConvertToString(GetMaps());
             return mapNames;
         }
 
         // Convert LevelInfo list to string names
-        public static string[] ConvertToString(List<LevelInfo> info)
+        private static string[] ConvertToString(List<LevelInfo> info)
         {
             string[] names = new string[info.Count];
 
@@ -86,7 +86,7 @@ namespace XLMultiMapVote.Utils
         }
 
         // Filter map names based on a search string
-        public static string[] FilterArray(string[] mapNames, string searchString)
+        private static string[] FilterArray(string[] mapNames, string searchString)
         {
             // Split the search string into lowercase words
             string[] searchWords = searchString.ToLower().Split(' ');
@@ -98,7 +98,21 @@ namespace XLMultiMapVote.Utils
                 return searchWords.All(searchWord => s.ToLower().Contains(searchWord));
             }).ToArray();
         }
+        public static string[] FilterMaps(string mapName)
+        {
+            string[] mapList;
 
+            if (!string.IsNullOrEmpty(mapName))
+            {
+                mapList = FilterArray(GetMapNames(), mapName);
+            }
+            else
+            {
+                mapList = GetMapNames();
+            }
+
+            return mapList;
+        }
         // Choose a map on a tie from vote index and options
         public static string ChooseMapOnTie(Dictionary<int, int> voteIndex, string[] mapOptions)
         {

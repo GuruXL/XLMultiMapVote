@@ -21,7 +21,8 @@ namespace XLMultiMapVote
 
         public Dictionary<int, int> voteIndex = new Dictionary<int, int>();
 
-        public VoteState voteState = new VoteState();
+        //public VoteState voteState = new VoteState();
+        public VoteState voteState;
 
         //public float countDownValue { get; private set; } = 0.0f;
 
@@ -124,31 +125,38 @@ namespace XLMultiMapVote
                 voteIndex[i] = 0; // Initialize all vote counts to 0
             }
         }
-
         public IEnumerator ChangeMap()
         {
-            //isMapchanging = true;
-
             yield return new WaitForSecondsRealtime(Main.settings.popUpTime);
 
-            string votedMap = GetVotedMap();
-            MapHelper.nextLevelInfo = MapHelper.GetMapInfo(votedMap);
-
-            if (!string.IsNullOrEmpty(votedMap) && MapHelper.nextLevelInfo != null && isMapchanging)
+            try
             {
-                ShowMessage(Labels.changetoMessage + votedMap, 3f);
-                // LevelManager.Instance.LoadLevel(mapInfo);
-                LevelManager.Instance.PlayLevel(MapHelper.nextLevelInfo);
-                ClearPopUpOptions();
+                string votedMap = GetVotedMap();
+                MapHelper.nextLevelInfo = MapHelper.GetMapInfo(votedMap);
+
+                if (!string.IsNullOrEmpty(votedMap) && MapHelper.nextLevelInfo != null && isMapchanging)
+                {
+                    ShowMessage(Labels.changetoMessage + votedMap, 3f);
+                    // LevelManager.Instance.LoadLevel(mapInfo);
+                    LevelManager.Instance.PlayLevel(MapHelper.nextLevelInfo);
+                    ClearPopUpOptions();
+                }
+                else
+                {
+                    // Handle invalid map error
+                    MessageSystem.QueueMessage(MessageDisplayData.Type.Error, Labels.invalidMapError, 2.5f);
+                    Main.Logger.Log(Labels.invalidMapError);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // Handle invalid map error
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Error, Labels.invalidMapError, 2.5f);
-                Main.Logger.Log(Labels.invalidMapError);
+                Main.Logger.Error($"Map Change Error - {ex.Message}");
+            }
+            finally
+            {
+                isMapchanging = false;
             }
 
-            isMapchanging = false;
             yield return null;
         }
 
@@ -179,7 +187,7 @@ namespace XLMultiMapVote
                 }
             }
 
-            if (tiedOptions.Count == 1)
+            if (tiedOptions.Count == 1) // If there is only one option with the highest votes, return it
             {
                 int chosenIndex = tiedOptions[0];
                 if (chosenIndex >= 0 && chosenIndex < popUpOptions.Length)
@@ -189,7 +197,9 @@ namespace XLMultiMapVote
             }
 
             // Handle the tie case by using the existing method
-            return MapHelper.ChooseMapOnTie(voteIndex, popUpOptions);
+            string chosenMap = MapHelper.ChooseMapOnTie(voteIndex, popUpOptions);
+            ShowMessage(Labels.tiedMapMessage, 5f);
+            return chosenMap;
         }
         /* GetVotedMap() old version
         private string GetVotedMap()
@@ -241,7 +251,7 @@ namespace XLMultiMapVote
         {
             Objective[] blanklist = new Objective[0];
             ShowVoteList(blanklist);
-            ShowPlayerPopUp(Labels.voteCancelError, false, 2f);
+            ShowPlayerPopUp(Labels.voteCancelError, false, 1f);
             ShowMessage(Labels.voteCancelError, 5f);
             StopCountdown();
         }

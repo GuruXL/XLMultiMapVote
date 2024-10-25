@@ -7,8 +7,9 @@ using ModIO.UI;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
 using XLMultiMapVote.UI;
-using XLMultiMapVote.Utils;
 using Photon.Pun;
+using System;
+using Object = UnityEngine.Object;
 
 namespace XLMultiMapVote
 {
@@ -27,13 +28,21 @@ namespace XLMultiMapVote
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
-            settings = UnityModManager.ModSettings.Load<Settings>(modEntry);
-            modEntry.OnGUI = OnGUI;
-            modEntry.OnSaveGUI = new System.Action<UnityModManager.ModEntry>(OnSaveGUI);
-            modEntry.OnToggle = new System.Func<UnityModManager.ModEntry, bool, bool>(OnToggle);
-            modEntry.OnUnload = new System.Func<UnityModManager.ModEntry, bool>(Unload);
-            Main.modEntry = modEntry;
-            Logger.Log(nameof(Load));
+            try
+            {
+                settings = UnityModManager.ModSettings.Load<Settings>(modEntry);
+                modEntry.OnGUI = OnGUI;
+                modEntry.OnSaveGUI = new Action<UnityModManager.ModEntry>(OnSaveGUI);
+                modEntry.OnToggle = new Func<UnityModManager.ModEntry, bool, bool>(OnToggle);
+                modEntry.OnUnload = new Func<UnityModManager.ModEntry, bool>(Unload);
+                Main.modEntry = modEntry;
+                Logger.Log(nameof(Load));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error Loading {modEntry}: {ex.Message}");
+                return false;
+            }
 
             return true;
         }
@@ -138,77 +147,63 @@ namespace XLMultiMapVote
         private static bool OnToggle(UnityModManager.ModEntry modEntry, bool value)
         {
             if (enabled == value)
-                return true;  // return immediately
+                return true;
 
             enabled = value;
 
             if (enabled)
             {
-                harmonyInstance = new Harmony(modEntry.Info.Id);
-                harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
-
-                ScriptManager = new GameObject("XLMultiMapVote");
-                sceneChangeManager = ScriptManager.AddComponent<SceneChangeManager>();
-                multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
-                uiController = ScriptManager.AddComponent<UIController>();
-                Object.DontDestroyOnLoad(ScriptManager);
-
-                AssetLoader.LoadBundles();
-            }
-            else
-            {
-                harmonyInstance.UnpatchAll(harmonyInstance.Id);
-                AssetLoader.UnloadAssetBundle();
-                if (ScriptManager != null)  // Ensure ScriptManager exists before trying to destroy it
+                try
                 {
-                    Object.Destroy(ScriptManager);
-                }
-            }
-
-            return true;  // Always return true when successful
-        }
-        /* OnToggle() old version
-        private static bool OnToggle(UnityModManager.ModEntry modEntry, bool value)
-        {
-            bool flag;
-            if (enabled == value)
-            {
-                flag = true;
-            }
-            else
-            {
-                enabled = value;
-                if (enabled)
-                {
-                    harmonyInstance = new Harmony((modEntry.Info).Id);
+                    harmonyInstance = new Harmony(modEntry.Info.Id);
                     harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
+
                     ScriptManager = new GameObject("XLMultiMapVote");
+                    sceneChangeManager = ScriptManager.AddComponent<SceneChangeManager>();
                     multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
                     uiController = ScriptManager.AddComponent<UIController>();
                     Object.DontDestroyOnLoad(ScriptManager);
 
                     AssetLoader.LoadBundles();
                 }
-                else
+                catch (Exception ex)
                 {
-                    harmonyInstance.UnpatchAll(harmonyInstance.Id);
-                    AssetLoader.UnloadAssetBundle();
-                    Object.Destroy(ScriptManager);
+                    Logger.Error($"Error during {modEntry} initialization: {ex.Message}");
+                    enabled = false; // Rollback enabling if an error occurs
+                    return false;
                 }
-                flag = true;
             }
-            return flag;
-        }
-        */
-        public static bool Unload(UnityModManager.ModEntry modEntry)
-        {
-            harmonyInstance.UnpatchAll(harmonyInstance.Id);
-            AssetLoader.UnloadAssetBundle();
-            Object.Destroy(ScriptManager);
-            Logger.Log(nameof(Unload));
+            else
+            {
+                Unload(modEntry);
+            }
+
             return true;
         }
 
+        public static bool Unload(UnityModManager.ModEntry modEntry)
+        {
+            try
+            {
+                harmonyInstance?.UnpatchAll(harmonyInstance.Id);
+                AssetLoader.UnloadAssetBundle();
+
+                if (ScriptManager != null)
+                {
+                    Object.Destroy(ScriptManager);
+                    ScriptManager = null; // Null the reference after destroying to avoid potential issues
+                }
+
+                Logger.Log(nameof(Unload));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error during {modEntry} unload: {ex.Message}");
+                return false;
+            }
+
+            return true;
+        }
         public static UnityModManager.ModEntry.ModLogger Logger => modEntry.Logger;
     }
 }
