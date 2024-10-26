@@ -1,13 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using Rewired;
+﻿using UnityEngine;
 using GameManagement;
 using ModIO.UI;
-using System.Collections;
 using System;
-using TMPro;
 using UnityEngine.Events;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;

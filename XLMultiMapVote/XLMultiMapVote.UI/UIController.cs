@@ -2,22 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using GameManagement;
-using ModIO.UI;
-using UnityEngine.SceneManagement;
 using System;
-using System.Linq;
-using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine.UI;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
 using XLMultiMapVote.Map;
+using XLMultiMapVote.State;
 using XLMultiMapVote.UI.Components;
 using TMPro;
-using UnityEngine.Events;
-using Rewired;
 using UnityEngine.EventSystems;
-using HarmonyLib;
+using ModIO.UI;
 
 namespace XLMultiMapVote.UI
 {
@@ -242,13 +236,21 @@ namespace XLMultiMapVote.UI
 
         private void AddMap()
         {
-            if (uiDropDownList.options.Count <= 0
-                || string.IsNullOrEmpty(uiDropDownList.captionText.text)
-                || uiDropDownList.captionText.text.Contains(Labels.addMapText))
+            if (uiDropDownList.options.Count <= 0)
+            {
                 return;
+            }
+            string dropDownSelection = uiDropDownList.captionText.text;
 
-            Main.multiMapVote.AddMapToOptions(uiDropDownList.captionText.text);
-            CreateMapListLabel(uiDropDownList.captionText.text);
+            if (string.IsNullOrEmpty(dropDownSelection) 
+                || dropDownSelection.Contains(MapHelper.currentLevelInfo.name) 
+                || dropDownSelection.Contains(Labels.addMapText))
+            {
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.addMapError, 2.0f);
+                return;
+            }
+            Main.multiMapVote.AddMapToOptions(dropDownSelection);
+            CreateMapListLabel(dropDownSelection);
         }
 
         private void ClearMapList(bool clearpopUpOptions)

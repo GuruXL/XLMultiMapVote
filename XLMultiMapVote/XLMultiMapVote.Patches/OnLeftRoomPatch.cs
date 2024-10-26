@@ -2,7 +2,6 @@
 using SkaterXL.Multiplayer;
 using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime;
 using ModIO.UI;
 
 namespace XLMultiMapVote.Patches
@@ -10,11 +9,10 @@ namespace XLMultiMapVote.Patches
     
     [HarmonyPatch(typeof(MultiplayerManager))]
     [HarmonyPatch("OnLeftRoom")]
-    class OnLeftRoomPatch
+    public static class OnLeftRoomPatch
     {
         public static void Postfix()
         {
-
             if (!Main.multiMapVote.isMapchanging)
                 return;
 

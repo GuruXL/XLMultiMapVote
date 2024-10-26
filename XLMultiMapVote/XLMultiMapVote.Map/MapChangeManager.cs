@@ -27,7 +27,7 @@ namespace XLMultiMapVote.Map
 
             if (PhotonNetwork.IsMasterClient)
             {
-                MapHelper.SetCurrentLevel();
+                MapHelper.SetCurrentLevel(levelInfo);
 
                 if (MapHelper.HasMapChanged())
                 {

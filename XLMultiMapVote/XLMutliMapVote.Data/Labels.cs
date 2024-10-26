@@ -28,5 +28,7 @@
         public const string voteCancelError = "Voting has been cancelled - the map will no longer change";
 
         public const string mapListEmptyError = "Cannot queue vote - Map list must have a minimun of 2 maps.";
+
+        public const string addMapError = "Cannot add current map to voting list";
     }
 }

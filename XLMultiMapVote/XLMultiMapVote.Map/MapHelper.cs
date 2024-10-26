@@ -10,19 +10,27 @@ namespace XLMultiMapVote.Map
         public static List<LevelInfo> combinedMapList = new List<LevelInfo>();
         public static string[] mapNames;
 
-        public static LevelInfo currentLevelInfo { get; set; }
-        public static LevelInfo nextLevelInfo { get; set; }
+        public static LevelInfo currentLevelInfo { get; private set; }
+        public static LevelInfo nextLevelInfo { get; private set; }
 
         public static bool HasMapChanged()
         {
             return nextLevelInfo != null && currentLevelInfo == nextLevelInfo;
         }
 
-        public static void SetCurrentLevel()
+        public static void SetCurrentLevel(LevelInfo level)
         {
-            if (currentLevelInfo != nextLevelInfo)
+            if (currentLevelInfo != level)
             {
-                currentLevelInfo = nextLevelInfo;
+                currentLevelInfo = level;
+                SetNextLevel(currentLevelInfo);
+            }
+        }
+        public static void SetNextLevel(LevelInfo level)
+        {
+            if (nextLevelInfo != level)
+            {
+                nextLevelInfo = level;
             }
         }
 

@@ -7,6 +7,7 @@ using SkaterXL.Data;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
 using XLMultiMapVote.Map;
+using XLMultiMapVote.State;
 
 namespace XLMultiMapVote
 {
@@ -132,7 +133,8 @@ namespace XLMultiMapVote
             try
             {
                 string votedMap = GetVotedMap();
-                MapHelper.nextLevelInfo = MapHelper.GetMapInfo(votedMap);
+                LevelInfo mapInfo = MapHelper.GetMapInfo(votedMap);
+                MapHelper.SetNextLevel(mapInfo);
 
                 if (!string.IsNullOrEmpty(votedMap) && MapHelper.nextLevelInfo != null && isMapchanging)
                 {
@@ -313,7 +315,7 @@ namespace XLMultiMapVote
         }
         public void AddMapToOptions(string selectedMap)
         {
-            if (string.IsNullOrEmpty(selectedMap) || selectedMap.Contains(Labels.addMapText))
+            if (string.IsNullOrEmpty(selectedMap))
             {
                 return;
             }

@@ -1,8 +1,5 @@
-﻿using Photon.Pun;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using XLMultiMapVote;
 
 namespace XLMultiMapVote.Utils
 {

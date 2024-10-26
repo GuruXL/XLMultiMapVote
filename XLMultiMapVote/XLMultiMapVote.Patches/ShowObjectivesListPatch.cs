@@ -1,10 +1,5 @@
 ﻿using HarmonyLib;
-using SkaterXL.Multiplayer;
-using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime;
-using ModIO.UI;
-using UnityEngine.Rendering.HighDefinition;
 
 namespace XLMultiMapVote.Patches
 { 

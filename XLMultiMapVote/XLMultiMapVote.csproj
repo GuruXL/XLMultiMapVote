@@ -144,6 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="XLMultiMapVote.Map\MapChangeManager.cs" />
+    <Compile Include="XLMultiMapVote.Patches\OnJoinedRoomPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\ShowObjectivesListPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnMasterClientSwitchedPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnLeftRoomPatch.cs" />
@@ -185,7 +186,7 @@
     <Compile Include="RapidGUI\Utilities\WindowInvoker.cs" />
     <Compile Include="XLMultiMapVote\Settings.cs" />
     <Compile Include="XLMultiMapVote\XLMultiMapVote.cs" />
-    <Compile Include="XLMutliMapVote.Data\VoteState.cs" />
+    <Compile Include="XLMultiMapVote.State\VoteState.cs" />
     <Compile Include="XLMutliMapVote.Data\Labels.cs" />
   </ItemGroup>
   <ItemGroup>

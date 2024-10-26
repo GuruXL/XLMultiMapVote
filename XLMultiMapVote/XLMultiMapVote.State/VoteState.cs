@@ -1,14 +1,9 @@
-﻿using System;
-using Photon.Pun;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using Photon.Pun;
 using GameManagement;
-using Rewired;
-using System.Collections;
 using ModIO.UI;
-using MapEditor;
+using XLMultiMapVote.Data;
 
-namespace XLMultiMapVote.Data
+namespace XLMultiMapVote.State
 {
 	public class VoteState : GameState
 	{
