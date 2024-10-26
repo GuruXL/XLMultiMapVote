@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Rewired;
 
-namespace XLMultiMapVote.UI
+namespace XLMultiMapVote.UI.Components
 {
     public class ScrollRectAutoScroll : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {

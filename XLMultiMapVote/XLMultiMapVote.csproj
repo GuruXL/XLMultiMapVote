@@ -143,17 +143,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="XLMultiMapVote.Map\MapChangeManager.cs" />
     <Compile Include="XLMultiMapVote.Patches\ShowObjectivesListPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnMasterClientSwitchedPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnLeftRoomPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnEnableMenuPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
-    <Compile Include="XLMultiMapVote.UI\ScrollRectAutoScroll.cs" />
+    <Compile Include="XLMultiMapVote.UI\MenuButtonManager.cs" />
+    <Compile Include="XLMultiMapVote.UI\Components\ScrollRectAutoScroll.cs" />
     <Compile Include="XLMultiMapVote.UI\UIController.cs" />
     <Compile Include="XLMultiMapVote.Utils\AssetLoader.cs" />
-    <Compile Include="XLMultiMapVote.Utils\MapHelper.cs" />
+    <Compile Include="XLMultiMapVote.Map\MapHelper.cs" />
+    <Compile Include="XLMultiMapVote.UI\Components\SelectableSounds.cs" />
     <Compile Include="XLMultiMapVote.Utils\ButtonGetter.cs" />
-    <Compile Include="XLMultiMapVote.Utils\SceneChangeManager.cs" />
+    <Compile Include="XLMultiMapVote.Map\SceneChangeManager.cs" />
     <Compile Include="XLMultiMapVote.Utils\ResourceExtractor.cs" />
     <Compile Include="XLMultiMapVote\Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

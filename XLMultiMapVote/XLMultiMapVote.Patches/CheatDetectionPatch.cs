@@ -10,7 +10,7 @@ namespace XLMultiMapVote.Patches
     {
         public static bool Prefix(CheatDetection.ControlType type, ref bool __result)
         {
-            if (type == CheatDetection.ControlType.Popup && Main.settings.allowPopUps)
+            if (type == CheatDetection.ControlType.Popup && !Main.settings.disableVotingForSelf)
             {
                 __result = true; // Bypass cheat detection
                 //Main.Logger.Log("Cheat Detection Bypassed");

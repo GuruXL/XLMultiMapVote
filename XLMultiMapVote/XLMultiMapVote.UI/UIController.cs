@@ -11,6 +11,8 @@ using Photon.Realtime;
 using UnityEngine.UI;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
+using XLMultiMapVote.Map;
+using XLMultiMapVote.UI.Components;
 using TMPro;
 using UnityEngine.Events;
 using Rewired;
@@ -25,26 +27,17 @@ namespace XLMultiMapVote.UI
 
         public GameObject mapVoteUIobj;
 
-        private GameObject menuButtonPrefab;
-        public MenuButton customMenuButton;
-        public MenuButton cancelVoteButton;
-        private MultiplayerMainMenu.ButtonVisibilityDef menuButtonVisibility;
-        private MultiplayerMainMenu.ButtonVisibilityDef cancelButtonVisibility;
-
         // UI Elements
-        //public Dropdown uiDropDownList;
         public TMP_Dropdown uiDropDownList;
-        //public Text mapLabelPrefab;
+        private Scrollbar uiDropDownScrollBar;
         public TextMeshProUGUI mapLabelPrefab;
+        private Scrollbar mapLabelScrollBar;
         public List<TextMeshProUGUI> mapLabelList = new List<TextMeshProUGUI>();
 
         private Button addMapButton;
         private Button clearMapButton;
         private Button voteButton;
         private Button exitButton;
-
-        //private InputField filterMapsInput;
-        //private InputField timerInput;
 
         private TMP_InputField filterMapsInput;
         private TMP_InputField timerInput;
@@ -60,16 +53,10 @@ namespace XLMultiMapVote.UI
             CreateCustomUIRoutine();
         }
 
-        private void Start()
-        {
-            SetUpMenuButtons();
-        }
-
         private void OnDestroy()
         {
-            DestroyButtons();
             RemoveListeners();
-            Main.Logger.Log("UIController OnDestory Called");
+            //Main.Logger.Log("UIController OnDestory Called");
         }
 
         private void CreateCustomUIRoutine()
@@ -115,180 +102,17 @@ namespace XLMultiMapVote.UI
                 createCustomUIroutine = null;
             }
         }
-
-        private void SetUpMenuButtons()
-        {
-            GetButtonPrefab();
-            CreateMenuButton();
-            CreateCancelVoteButton();
-            //SetUpCanvasScaler();
-        }
-        
-        private void GetButtonPrefab()
-        {
-            try
-            {
-                //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Players Button");
-                //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Join Next Map Button");
-                //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Start Game Mode");
-
-                menuButtonPrefab = ButtonGetter.GetMultiplayerMenuButton();
-
-                if (menuButtonPrefab == null)
-                {
-                    Main.Logger.Error("menuButtonPrefab Not Found");
-                }
-            }
-            catch (Exception ex)
-            {
-                Main.Logger.Error($"Error Finding MainMenuButton Prefab - {ex.Message}");
-            }
-        }
-
-        private void CreateMenuButton()
-        {
-            try
-            {
-                if (customMenuButton == null)
-                {
-                    GameObject newButton = Instantiate(menuButtonPrefab, menuButtonPrefab.transform.parent);
-                    newButton.transform.SetSiblingIndex(menuButtonPrefab.gameObject.transform.GetSiblingIndex() - 1); // adds new button one place below button prefab
-                    //newButton.transform.SetAsFirstSibling();
-                    //newButton.transform.SetAsLastSibling();
-                    newButton.name = Labels.menuButtonLabel;
-
-                    customMenuButton = newButton.GetComponent<MenuButton>();
-
-                    //customMenuButton.GreyedOut = false;
-                    customMenuButton.GreyedOutInfoText = Labels.menuButtonLabel;
-                    customMenuButton.Label.SetText(Labels.menuButtonLabel);
-                    //customMenuButton.interactable = true;
-
-                    customMenuButton.onClick.RemoveAllListeners();  // Remove existing listeners
-                    customMenuButton.onClick.SetPersistentListenerState(0, UnityEventCallState.Off); // removes persistant listeners that are set in unity editor.
-                    customMenuButton.onClick.AddListener(() => MenuButtonOnClick());  // Add new listener
-
-
-                    menuButtonVisibility = new MultiplayerMainMenu.ButtonVisibilityDef();
-                    menuButtonVisibility.buttonGO = customMenuButton.gameObject;
-                    menuButtonVisibility.showOnlyForMasterClient = true;
-                    menuButtonVisibility.showInLobby = false;
-                    menuButtonVisibility.showInPublicRoom = true;
-                    menuButtonVisibility.showInPrivateRoom = true;
-                    menuButtonVisibility.showWhenDisconnected = false;
-                    MultiplayerManager.Instance.menuController.mainMenu.options.Add(menuButtonVisibility);
-
-                    //customMenuButton.gameObject.SetActive(false);
-                }
-            }
-            catch (Exception ex)
-            {
-                Main.Logger.Error($"Failed to Create Vote Button - {ex.Message}");
-            }
-            
-        }
-        private void CreateCancelVoteButton()
-        {
-            try
-            {
-                if (cancelVoteButton == null)
-                {
-                    GameObject newButton = Instantiate(menuButtonPrefab, menuButtonPrefab.transform.parent);
-
-                    if (customMenuButton != null)
-                    {
-                        newButton.transform.SetSiblingIndex(customMenuButton.transform.GetSiblingIndex() + 1);
-                    }
-                    else
-                    {
-                        newButton.transform.SetAsLastSibling();
-                        //newButton.transform.SetAsFirstSibling();
-                    }
-
-                    newButton.name = Labels.cancelButtonLabel;
-
-                    cancelVoteButton = newButton.GetComponent<MenuButton>();
-
-                    //cancelVoteButton.GreyedOut = false;
-                    cancelVoteButton.GreyedOutInfoText = Labels.cancelButtonLabel;
-                    cancelVoteButton.Label.SetText(Labels.cancelButtonLabel);
-                    //cancelVoteButton.interactable = true;
-
-                    cancelVoteButton.onClick.RemoveAllListeners();  // Remove existing listeners
-                    cancelVoteButton.onClick.SetPersistentListenerState(0, UnityEventCallState.Off); // removes persistant listeners that are set in unity editor.
-                    cancelVoteButton.onClick.AddListener(() => CancelButtonOnClick());  // Add new listener
-
-                    cancelButtonVisibility = new MultiplayerMainMenu.ButtonVisibilityDef();
-                    cancelButtonVisibility.buttonGO = cancelVoteButton.gameObject;
-                    cancelButtonVisibility.showOnlyForMasterClient = true;
-                    cancelButtonVisibility.showInLobby = false;
-                    cancelButtonVisibility.showInPublicRoom = true;
-                    cancelButtonVisibility.showInPrivateRoom = true;
-                    cancelButtonVisibility.showWhenDisconnected = false;
-                    MultiplayerManager.Instance.menuController.mainMenu.options.Add(cancelButtonVisibility);
-
-                    //cancelVoteButton.gameObject.SetActive(false);
-                }
-            }
-            catch (Exception ex)
-            {
-                Main.Logger.Error($"Failed to Create Cancel Button - {ex.Message}");
-            }
-           
-        }
-        public void DestroyButtons()
-        {
-            try
-            {
-                if (customMenuButton != null)
-                {
-                    customMenuButton.gameObject.SetActive(false);
-                    customMenuButton.onClick.RemoveAllListeners();
-                    Destroy(customMenuButton.gameObject);
-                    MultiplayerManager.Instance.menuController.mainMenu.options.Remove(menuButtonVisibility);
-                    menuButtonVisibility = null;
-                    customMenuButton = null;
-                }
-
-                if (cancelVoteButton != null)
-                {
-                    cancelVoteButton.gameObject.SetActive(false);
-                    cancelVoteButton.onClick.RemoveAllListeners();
-                    MultiplayerManager.Instance.menuController.mainMenu.options.Remove(cancelButtonVisibility);
-                    Destroy(cancelVoteButton.gameObject);
-                    cancelButtonVisibility = null;
-                    cancelVoteButton = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                Main.Logger.Error($"Exception Destroying Menu Buttons - {ex.Message}");
-            }
-        }
-        private void MenuButtonOnClick()
-        {
-            GameStateMachine.Instance.RequestTransitionTo(Main.multiMapVote.voteState, true);
-        }
-        private void CancelButtonOnClick()
-        {
-            if (!Main.multiMapVote.isMapchanging)
-            {
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"No Vote in Progress", 2.5f);
-                return;
-            }
-
-            Main.multiMapVote.CancelVote(true);
-        }
+ 
         public void EnterVoteUI()
         {
             Cursor.visible = true;
 
             EventSystem.current.SetSelectedGameObject(null);
+
             mapVoteUIobj.SetActive(true);
             SetUIInteractable(true);
             EventSystem.current.SetSelectedGameObject(uiDropDownList.gameObject);
             GameStateMachine.Instance.SemiTransparentLayer.SetActive(false);
-
             ClearMapList(true);
             UpdateTimerValue();
         }
@@ -298,8 +122,10 @@ namespace XLMultiMapVote.UI
             Cursor.visible = false;
 
             EventSystem.current.SetSelectedGameObject(null);
+
             SetUIInteractable(false);
             mapVoteUIobj.SetActive(false);
+            UISounds.Instance.PlayOneShotExit();
         }
 
         private void GetUIComponents()
@@ -319,20 +145,20 @@ namespace XLMultiMapVote.UI
                 exitButton = exitobj.GetComponent<Button>();
 
                 Transform filterobj = mapVoteUIobj.transform.FindChildRecursively("InputField_FilterMap");
-                //filterMapsInput = filterobj.GetComponent<InputField>();
                 filterMapsInput = filterobj.GetComponent<TMP_InputField>();
 
                 Transform timerobj = mapVoteUIobj.transform.FindChildRecursively("InputField_PopupTime");
-                //timerInput = timerobj.GetComponent<InputField>();
                 timerInput = timerobj.GetComponent<TMP_InputField>();
 
                 Transform dropdownobj = mapVoteUIobj.transform.FindChildRecursively("MapListDropDown");
-                //uiDropDownList = dropdownobj.GetComponent<Dropdown>();
                 uiDropDownList = dropdownobj.GetComponent<TMP_Dropdown>();
+                uiDropDownScrollBar = uiDropDownList.template.GetComponentInChildren<Scrollbar>();
 
-                Transform maplabelobj = mapVoteUIobj.transform.FindChildRecursively("TextLabelPrefab");
-                //mapLabelPrefab = maplabelobj.GetComponent<Text>();
+                Transform mapListScrollView = mapVoteUIobj.transform.FindChildRecursively("MapListScollView");
+                mapLabelScrollBar = mapListScrollView.GetComponentInChildren<Scrollbar>();
+                Transform maplabelobj = mapListScrollView.transform.FindChildRecursively("TextLabelPrefab");
                 mapLabelPrefab = maplabelobj.GetComponent<TextMeshProUGUI>();
+
 
                 MapVoteListCanvas = ObjectiveListController.Instance.gameObject.GetComponent<Canvas>();
                 MapVoteListCanvas.sortingOrder = -1; // makes the UI appear behind the voting pop up instead of infront.
@@ -343,20 +169,34 @@ namespace XLMultiMapVote.UI
             catch (Exception ex)
             {
                 Main.Logger.Error($"Error Getting Components - {ex.Message}");
-            }     
+            }
         }
         private void AddUIComponents()
         {
             try
             {
-                if (uiDropDownList != null)
-                {
-                    uiDropDownList.template.gameObject.AddComponent<ScrollRectAutoScroll>();
-                }
+                uiDropDownList.template.gameObject.AddComponent<ScrollRectAutoScroll>();
+                uiDropDownList.gameObject.AddComponent<SelectableSounds>();
+                uiDropDownList.itemText.transform.parent.gameObject.AddComponent<SelectableSounds>();
+                uiDropDownScrollBar.gameObject.AddComponent<SelectableSounds>();
+
+                mapLabelScrollBar.gameObject.AddComponent<SelectableSounds>();
+
+                addMapButton.gameObject.AddComponent<SelectableSounds>();
+
+                clearMapButton.gameObject.AddComponent<SelectableSounds>();
+
+                voteButton.gameObject.AddComponent<SelectableSounds>();
+
+                exitButton.gameObject.AddComponent<SelectableSounds>();
+
+                filterMapsInput.gameObject.AddComponent<SelectableSounds>();
+
+                timerInput.gameObject.AddComponent<SelectableSounds>();
             }
             catch (Exception ex)
             {
-                Main.Logger.Error($"Failed to add ScrollRectAutoScroll - {ex.Message}");
+                Main.Logger.Error($"Error Adding Components - {ex.Message}");
             }
         }
         private void SetUIInteractable(bool IsInteractable)
@@ -369,6 +209,7 @@ namespace XLMultiMapVote.UI
             timerInput.interactable = IsInteractable;
             uiDropDownList.interactable = IsInteractable;
         }
+        /* SetUpCanvasScaler not needed
         private void SetUpCanvasScaler()
         {
             voteListScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -377,17 +218,15 @@ namespace XLMultiMapVote.UI
             voteListScaler.matchWidthOrHeight = 0.5f;
             voteListScaler.referencePixelsPerUnit = 100f;
         }
+        */
         private void SetUpListeners()
         {
-            addMapButton.onClick.AddListener(()=> AddMap());
+            addMapButton.onClick.AddListener(() => AddMap());
             clearMapButton.onClick.AddListener(() => ClearMapList(true));
             voteButton.onClick.AddListener(() => VoteButton());
             exitButton.onClick.AddListener(() => ExitButton());
-
-            //filterMapsInput.onEndEdit.AddListener(delegate { UpdateDropDownList(); });
             filterMapsInput.onValueChanged.AddListener(delegate { UpdateDropDownList(); });
             timerInput.onEndEdit.AddListener(delegate { UpdateTimerValue(); });
-
             //uiDropDownList.onValueChanged.AddListener(delegate { UpdateDropDownList(); });
         }
         private void RemoveListeners()
@@ -396,17 +235,15 @@ namespace XLMultiMapVote.UI
             clearMapButton.onClick.RemoveAllListeners();
             voteButton.onClick.RemoveAllListeners();
             exitButton.onClick.RemoveAllListeners();
-
             filterMapsInput.onEndEdit.RemoveAllListeners();
             timerInput.onEndEdit.RemoveAllListeners();
-
             //uiDropDownList.onValueChanged.RemoveAllListeners();
         }
 
         private void AddMap()
         {
-            if (uiDropDownList.options.Count <= 0 
-                || string.IsNullOrEmpty(uiDropDownList.captionText.text) 
+            if (uiDropDownList.options.Count <= 0
+                || string.IsNullOrEmpty(uiDropDownList.captionText.text)
                 || uiDropDownList.captionText.text.Contains(Labels.addMapText))
                 return;
 
@@ -431,10 +268,12 @@ namespace XLMultiMapVote.UI
         }
         private void VoteButton()
         {
-            if (uiDropDownList.options.Count <= 0 
-                || Main.multiMapVote.popUpOptions.Length <= 0 
+            if (uiDropDownList.options.Count <= 0
+                || Main.multiMapVote.popUpOptions.Length <= 0
                 || !MultiplayerManager.Instance.IsMasterClient)
+            {
                 return;
+            }             
 
             Main.multiMapVote.QueueVote();
             ClearMapList(false);
@@ -555,7 +394,5 @@ namespace XLMultiMapVote.UI
 
             mapLabelList.Clear();
         }
-
-       
     }
 }

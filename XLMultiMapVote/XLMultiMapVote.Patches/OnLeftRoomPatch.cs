@@ -22,7 +22,7 @@ namespace XLMultiMapVote.Patches
             {
                 Main.multiMapVote.CancelVote(true);
 
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"Cancelled Over Network", 2.0f);
+                //MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"Cancelled Over Network", 2.0f);
             }
             else
             {
@@ -31,7 +31,7 @@ namespace XLMultiMapVote.Patches
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"Cancelled Locally", 2.0f);
             }
 
-            MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"OnLeftRoom Patch Has Run", 2.0f);
+            //MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"OnLeftRoom Patch Has Run", 2.0f);
         }
     }
     

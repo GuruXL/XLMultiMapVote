@@ -1,10 +1,11 @@
 ﻿using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using XLMultiMapVote;
+using XLMultiMapVote.Utils;
 
-namespace XLMultiMapVote.Utils
+namespace XLMultiMapVote.Map
 {
+    /*
     public class SceneChangeManager : MonoBehaviour
     {
         private void Awake()
@@ -46,4 +47,5 @@ namespace XLMultiMapVote.Utils
             //Main.Logger.Log("Scene Unloaded: " + scene.name);
         }
     }
+    */
 }

@@ -3,24 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
 
-namespace XLMultiMapVote.Utils
+namespace XLMultiMapVote.Map
 {
     public static class MapHelper
     {
-        // Existing map lists
         public static List<LevelInfo> combinedMapList = new List<LevelInfo>();
         public static string[] mapNames;
 
-        // Properties to track current and last LevelInfo
         public static LevelInfo currentLevelInfo { get; set; }
         public static LevelInfo nextLevelInfo { get; set; }
-        // Utility to check if the map has changed
+
         public static bool HasMapChanged()
         {
             return nextLevelInfo != null && currentLevelInfo == nextLevelInfo;
         }
 
-        // Method to update current level
         public static void SetCurrentLevel()
         {
             if (currentLevelInfo != nextLevelInfo)
@@ -29,7 +26,6 @@ namespace XLMultiMapVote.Utils
             }
         }
 
-        // Method to get map info by name
         public static LevelInfo GetMapInfo(string votedMap)
         {
             if (combinedMapList?.Count > 0)
@@ -45,7 +41,6 @@ namespace XLMultiMapVote.Utils
             return null;
         }
 
-        // Get combined list of all maps
         private static List<LevelInfo> GetMaps()
         {
             combinedMapList.Clear();

@@ -6,7 +6,7 @@ using System;
 using SkaterXL.Data;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
-
+using XLMultiMapVote.Map;
 
 namespace XLMultiMapVote
 {
@@ -137,8 +137,9 @@ namespace XLMultiMapVote
                 if (!string.IsNullOrEmpty(votedMap) && MapHelper.nextLevelInfo != null && isMapchanging)
                 {
                     ShowMessage(Labels.changetoMessage + votedMap, 3f);
-                    // LevelManager.Instance.LoadLevel(mapInfo);
-                    LevelManager.Instance.PlayLevel(MapHelper.nextLevelInfo);
+                    //LevelManager.Instance.LoadLevel(mapInfo);
+                    //LevelManager.Instance.PlayLevel(MapHelper.nextLevelInfo);
+                    MultiplayerManager.Instance.LoadLevel(MapHelper.nextLevelInfo);
                     ClearPopUpOptions();
                 }
                 else

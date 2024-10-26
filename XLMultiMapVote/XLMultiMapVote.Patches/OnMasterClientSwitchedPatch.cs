@@ -22,14 +22,12 @@ namespace XLMultiMapVote.Patches
             if (newMasterClient.IsLocal)
             {
                 Main.multiMapVote.CancelVote(true);
-
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"newMasterClient Cancelled Over Network", 2.0f);
+                //MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"newMasterClient Cancelled Over Network", 2.0f);
             }
             else
             {
                 Main.multiMapVote.CancelVote(false);
-
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"newMasterClient Cancelled Locally", 2.0f);
+                //MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"newMasterClient Cancelled Locally", 2.0f);
             }
 
             MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"OnMasterClientSwitched Patch Has Run", 2.0f);

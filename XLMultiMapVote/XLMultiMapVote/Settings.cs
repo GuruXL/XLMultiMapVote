@@ -11,7 +11,8 @@ namespace XLMultiMapVote
     [Serializable]
     public class Settings : UnityModManager.ModSettings, IDrawable
     {
-        public bool allowPopUps = true;
+        public bool disableVotingForSelf = false;
+        //public bool allowPopUps = true;
 
         public float popUpTime = 30.0f;
 
