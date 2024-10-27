@@ -374,16 +374,21 @@ namespace XLMultiMapVote
         }
         private IEnumerator UpdateVoteList()
         {
-            float countdown;
+            string countdownText = CountdownUI.Instance.text.text;
+            if (countdownText == null) 
+            {
+                yield break;
+            }
 
+            float countdown;
             // Attempt to parse the countdown value initially
-            if (float.TryParse(CountdownUI.Instance.text.text, out countdown))
+            if (float.TryParse(countdownText, out countdown))
             {
                 while (countdown > 0.0f)
                 {
                     yield return new WaitForSecondsRealtime(0.5f);
 
-                    if (!float.TryParse(CountdownUI.Instance.text.text, out countdown))
+                    if (!float.TryParse(countdownText, out countdown))
                     {
                         yield break;
                     }
@@ -392,7 +397,6 @@ namespace XLMultiMapVote
                     yield return null; // This allows the loop to be more responsive
                 }
             }
-
             yield return null;
         }
     }

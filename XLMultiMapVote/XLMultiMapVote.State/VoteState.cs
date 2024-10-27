@@ -53,6 +53,10 @@ namespace XLMultiMapVote.State
                 //GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);
                 RequestTransitionBack();
 			}
+			else if (RewiredInput.PrimaryPlayer.GetButtonDown("B") && !Main.uiController.uiDropDownList.IsExpanded)
+			{
+                RequestTransitionBack();
+            }
 		}
 	}
 }
