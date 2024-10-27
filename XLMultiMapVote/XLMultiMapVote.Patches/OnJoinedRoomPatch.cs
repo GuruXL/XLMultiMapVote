@@ -19,7 +19,7 @@ namespace XLMultiMapVote.Patches
 
             if (PhotonNetwork.IsMasterClient)
             {
-                MapHelper.SetCurrentLevel(LevelManager.Instance.currentLevel);
+                MapHelper.SetCurrentLevel(LevelManager.Instance.currentLevel, true);
             }
         }
     }

@@ -196,7 +196,7 @@ namespace XLMultiMapVote.UI
         }
         private void CancelButtonOnClick()
         {
-            if (!Main.multiMapVote.isMapchanging)
+            if (!Main.multiMapVote.isMapChanging)
             {
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"No Vote in Progress", 2.5f);
                 return;

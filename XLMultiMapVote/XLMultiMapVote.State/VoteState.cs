@@ -16,7 +16,7 @@ namespace XLMultiMapVote.State
 				RequestTransitionBack();
 				return;
 			}
-			else if (Main.multiMapVote.isMapchanging)
+			else if (Main.multiMapVote.isMapChanging)
             {
 				MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.voteInProgressError, 2.5f);
 				//GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);

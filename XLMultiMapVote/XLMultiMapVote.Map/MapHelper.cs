@@ -9,7 +9,6 @@ namespace XLMultiMapVote.Map
     {
         public static List<LevelInfo> combinedMapList = new List<LevelInfo>();
         public static string[] mapNames;
-
         public static LevelInfo currentLevelInfo { get; private set; }
         public static LevelInfo nextLevelInfo { get; private set; }
 
@@ -18,12 +17,15 @@ namespace XLMultiMapVote.Map
             return nextLevelInfo != null && currentLevelInfo == nextLevelInfo;
         }
 
-        public static void SetCurrentLevel(LevelInfo level)
+        public static void SetCurrentLevel(LevelInfo level, bool setNextLevel)
         {
             if (currentLevelInfo != level)
             {
                 currentLevelInfo = level;
-                SetNextLevel(currentLevelInfo);
+            }
+            if (setNextLevel)
+            {
+                SetNextLevel(level);
             }
         }
         public static void SetNextLevel(LevelInfo level)
