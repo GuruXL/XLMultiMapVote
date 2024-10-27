@@ -22,7 +22,7 @@ namespace XLMultiMapVote.UI
         public GameObject mapVoteUIobj;
 
         // UI Elements
-        public TMP_Dropdown uiDropDownList;
+        public TMP_Dropdown uiDropDownList{ get; private set; }
         private Scrollbar uiDropDownScrollBar;
         public TextMeshProUGUI mapLabelPrefab;
         private Scrollbar mapLabelScrollBar;
@@ -33,7 +33,7 @@ namespace XLMultiMapVote.UI
         private Button voteButton;
         private Button exitButton;
 
-        private TMP_InputField filterMapsInput;
+        public TMP_InputField filterMapsInput{ get; private set; }
         private TMP_InputField timerInput;
 
         private Canvas MapVoteListCanvas;
@@ -153,7 +153,6 @@ namespace XLMultiMapVote.UI
                 Transform maplabelobj = mapListScrollView.transform.FindChildRecursively("TextLabelPrefab");
                 mapLabelPrefab = maplabelobj.GetComponent<TextMeshProUGUI>();
 
-
                 MapVoteListCanvas = ObjectiveListController.Instance.gameObject.GetComponent<Canvas>();
                 MapVoteListCanvas.sortingOrder = -1; // makes the UI appear behind the voting pop up instead of infront.
 
@@ -185,6 +184,7 @@ namespace XLMultiMapVote.UI
                 exitButton.gameObject.AddComponent<SelectableSounds>();
 
                 filterMapsInput.gameObject.AddComponent<SelectableSounds>();
+                //filterMapsInput.gameObject.AddComponent<DisableNavigationOnFocus>();
 
                 timerInput.gameObject.AddComponent<SelectableSounds>();
             }
@@ -312,11 +312,35 @@ namespace XLMultiMapVote.UI
         {
             uiDropDownList.captionText.text = text;
         }
-
         private void UpdateTimerValue()
         {
-            float value = float.Parse(timerInput.text);
+            float value = 30f; // Default value
+            if (!string.IsNullOrEmpty(timerInput.text))
+            {
+                if (float.TryParse(timerInput.text, out float parsedValue))
+                {
+                    if (parsedValue >= 1f)
+                    {
+                        value = parsedValue;
+                    }
+                    else
+                    {
+                        value = 1f;
+                        timerInput.SetTextWithoutNotify("1");
+                    }
+                }
+                else
+                {
+                    timerInput.SetTextWithoutNotify("30");
+                }
+            }
+            else
+            {
+                // If the text is null or empty, set it to "30"
+                timerInput.SetTextWithoutNotify("30");
+            }
 
+            // Update the pop-up time if it has changed
             if (Main.settings.popUpTime != value)
             {
                 Main.settings.popUpTime = value;

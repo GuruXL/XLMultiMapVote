@@ -5,6 +5,7 @@ using System;
 using UnityEngine.Events;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
+using System.Linq;
 
 namespace XLMultiMapVote.UI
 {
@@ -35,7 +36,19 @@ namespace XLMultiMapVote.UI
             CreateCancelVoteButton();
             //SetUpCanvasScaler();
         }
+        public GameObject GetMultiplayerMenuButton()
+        {
+            //var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options
+            //.FirstOrDefault(go => go.buttonGO.GetComponent<MenuButton>());
 
+            //var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options
+            //.LastOrDefault(go => go.buttonGO.GetComponent<MenuButton>());
+
+            var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options
+                .ElementAtOrDefault(7);
+
+            return firstActiveGO?.buttonGO;
+        }
         private void GetButtonPrefab()
         {
             try
@@ -44,7 +57,7 @@ namespace XLMultiMapVote.UI
                 //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Join Next Map Button");
                 //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Start Game Mode");
 
-                menuButtonPrefab = ButtonGetter.GetMultiplayerMenuButton();
+                menuButtonPrefab = GetMultiplayerMenuButton();
 
                 if (menuButtonPrefab == null)
                 {

@@ -13,7 +13,6 @@ namespace XLMultiMapVote.UI.Components
 
         private List<Selectable> m_Selectables = new List<Selectable>();
         private ScrollRect m_ScrollRect;
-        private Dropdown m_DropDown;
 
         private Vector2 m_NextScrollPosition = Vector2.up;
         public int RewiredPlayerID = 0;
@@ -30,7 +29,6 @@ namespace XLMultiMapVote.UI.Components
         void Awake()
         {
             m_ScrollRect = GetComponent<ScrollRect>();
-            m_DropDown = GetComponent<Dropdown>();
             //remove this line if not using Rewired
             rePlayer = ReInput.players.GetPlayer(RewiredPlayerID);
         }
