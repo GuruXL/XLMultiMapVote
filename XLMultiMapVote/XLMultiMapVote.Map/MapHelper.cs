@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections;
 
 namespace XLMultiMapVote.Map
 {
@@ -12,11 +11,30 @@ namespace XLMultiMapVote.Map
         public static LevelInfo currentLevelInfo { get; private set; }
         public static LevelInfo nextLevelInfo { get; private set; }
 
+        private static bool _isMapChanging = false;
+        private static bool _hasMapChangedByVote = false;
+        public static bool isMapChanging
+        {
+            get { return _isMapChanging; }
+            private set { _isMapChanging = value; }
+        }
+        public static void Set_isMapChanging(bool status)
+        {
+            _isMapChanging = status;
+        }
+        public static bool hasMapChangedByVote
+        {
+            get { return _hasMapChangedByVote; }
+            private set { _hasMapChangedByVote = value; }
+        }
+        public static void Set_hasMapChangedByVote(bool status)
+        {
+            _hasMapChangedByVote = status;
+        }
         public static bool HasMapChanged()
         {
             return nextLevelInfo != null && currentLevelInfo == nextLevelInfo;
         }
-
         public static void SetCurrentLevel(LevelInfo level, bool setNextLevel)
         {
             if (currentLevelInfo != level)
@@ -89,19 +107,45 @@ namespace XLMultiMapVote.Map
             }
             return names;
         }
-
-        // Filter map names based on a search string
         private static string[] FilterArray(string[] mapNames, string searchString)
         {
             // Split the search string into lowercase words
             string[] searchWords = searchString.ToLower().Split(' ');
 
             // Filter the array based on the search string
-            return mapNames.Where(s =>
+            var filteredResults = mapNames.Where(s =>
             {
                 // Check if all search words are contained in the string
                 return searchWords.All(searchWord => s.ToLower().Contains(searchWord));
-            }).ToArray();
+            }).ToList();
+
+            // Sort the results for more accurate matches
+            filteredResults.Sort((a, b) =>
+            {
+                string aLower = a.ToLower();
+                string bLower = b.ToLower();
+
+                // Prioritize strings that start with the searchString
+                bool aStartsWith = aLower.StartsWith(searchString.ToLower());
+                bool bStartsWith = bLower.StartsWith(searchString.ToLower());
+
+                if (aStartsWith && !bStartsWith)
+                    return -1;
+                if (!aStartsWith && bStartsWith)
+                    return 1;
+
+                // If both start or both do not start with the search string, prioritize by the index of the first occurrence
+                int aIndex = aLower.IndexOf(searchString.ToLower());
+                int bIndex = bLower.IndexOf(searchString.ToLower());
+
+                if (aIndex != bIndex)
+                    return aIndex.CompareTo(bIndex);
+
+                // If both have the same index, fall back to alphabetical order
+                return string.Compare(aLower, bLower, System.StringComparison.Ordinal);
+            });
+
+            return filteredResults.ToArray();
         }
         public static string[] FilterMaps(string mapName)
         {

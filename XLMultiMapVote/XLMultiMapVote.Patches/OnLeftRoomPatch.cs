@@ -3,6 +3,7 @@ using SkaterXL.Multiplayer;
 using UnityEngine;
 using Photon.Pun;
 using ModIO.UI;
+using XLMultiMapVote.Map;
 
 namespace XLMultiMapVote.Patches
 {
@@ -13,7 +14,7 @@ namespace XLMultiMapVote.Patches
     {
         public static void Postfix()
         {
-            if (!Main.multiMapVote.isMapChanging)
+            if (!MapHelper.isMapChanging)
                 return;
 
             if (PhotonNetwork.IsMasterClient)

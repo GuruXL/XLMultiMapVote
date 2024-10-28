@@ -106,9 +106,9 @@ namespace XLMultiMapVote.UI
             mapVoteUIobj.SetActive(true);
             SetUIInteractable(true);
             EventSystem.current.SetSelectedGameObject(uiDropDownList.gameObject);
-            GameStateMachine.Instance.SemiTransparentLayer.SetActive(false);
-            ClearMapList(true);
+            GameStateMachine.Instance.SemiTransparentLayer.SetActive(false); 
             UpdateTimerValue();
+            ClearMapList(true);
         }
 
         public void ExitVoteUI()
@@ -169,24 +169,21 @@ namespace XLMultiMapVote.UI
             try
             {
                 uiDropDownList.template.gameObject.AddComponent<ScrollRectAutoScroll>();
+
                 uiDropDownList.gameObject.AddComponent<SelectableSounds>();
                 uiDropDownList.itemText.transform.parent.gameObject.AddComponent<SelectableSounds>();
                 uiDropDownScrollBar.gameObject.AddComponent<SelectableSounds>();
 
                 mapLabelScrollBar.gameObject.AddComponent<SelectableSounds>();
-
                 addMapButton.gameObject.AddComponent<SelectableSounds>();
-
                 clearMapButton.gameObject.AddComponent<SelectableSounds>();
-
                 voteButton.gameObject.AddComponent<SelectableSounds>();
-
                 exitButton.gameObject.AddComponent<SelectableSounds>();
-
                 filterMapsInput.gameObject.AddComponent<SelectableSounds>();
-                //filterMapsInput.gameObject.AddComponent<DisableNavigationOnFocus>();
-
                 timerInput.gameObject.AddComponent<SelectableSounds>();
+
+                filterMapsInput.gameObject.AddComponent<DisableNavigationOnFocus>();
+                timerInput.gameObject.AddComponent<DisableNavigationOnFocus>();
             }
             catch (Exception ex)
             {
@@ -401,16 +398,18 @@ namespace XLMultiMapVote.UI
 
         private void ClearMapLabels()
         {
-            StartCoroutine(DestroyLabelObjects());
-        }
-        private IEnumerator DestroyLabelObjects()
-        {
             if (mapLabelList?.Count <= 0)
             {
                 Main.Logger.Log($"Map Label List is Empty");
-                yield break;
+                return;
             }
-
+            else
+            {
+                StartCoroutine(DestroyLabelObjects());
+            }
+        }
+        private IEnumerator DestroyLabelObjects()
+        {
             foreach (TextMeshProUGUI item in mapLabelList)
             {
                 item.gameObject.SetActive(false);

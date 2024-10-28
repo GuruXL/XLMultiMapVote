@@ -5,6 +5,7 @@ using System;
 using UnityEngine.Events;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
+using XLMultiMapVote.Map;
 using System.Linq;
 
 namespace XLMultiMapVote.UI
@@ -196,7 +197,7 @@ namespace XLMultiMapVote.UI
         }
         private void CancelButtonOnClick()
         {
-            if (!Main.multiMapVote.isMapChanging)
+            if (!MapHelper.isMapChanging)
             {
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"No Vote in Progress", 2.5f);
                 return;

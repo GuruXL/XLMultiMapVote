@@ -28,20 +28,7 @@ namespace XLMultiMapVote
 
         private Coroutine changeMapCoroutine;
         private Coroutine updateVoteListCoroutine;
-        public bool isMapChanging { get; private set; } = false;
-
-        // Private backing for hasMapChangedByVote
-        private bool _hasMapChangedByVote = false;
-
-        public bool hasMapChangedByVote
-        {
-            get { return _hasMapChangedByVote; }
-            private set { _hasMapChangedByVote = value; }
-        }
-        public void Set_hasMapChangedByVote(bool status)
-        {
-            _hasMapChangedByVote = status;
-        }
+      
         public void StartMapChangeRoutines()
         {
             // Start the ChangeMap coroutine and store the reference
@@ -49,7 +36,7 @@ namespace XLMultiMapVote
             {
                 changeMapCoroutine = StartCoroutine(ChangeMap());
 
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Success, "Change Map Started", 1.5f);
+                //MessageSystem.QueueMessage(MessageDisplayData.Type.Success, "Change Map Started", 1.5f);
             }
 
             // Start the UpdateVoteList coroutine and store the reference
@@ -57,7 +44,7 @@ namespace XLMultiMapVote
             {
                 updateVoteListCoroutine = StartCoroutine(UpdateVoteList());
 
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Success, "Update Vote List Started", 1.5f);
+                //MessageSystem.QueueMessage(MessageDisplayData.Type.Success, "Update Vote List Started", 1.5f);
             }
         }
         public void StopMapChangeRoutines()
@@ -68,7 +55,7 @@ namespace XLMultiMapVote
                 StopCoroutine(changeMapCoroutine);
                 changeMapCoroutine = null; // Set to null so it can be restarted again
 
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Change Map Stopped", 1.5f);
+                //MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Change Map Stopped", 1.5f);
             }
 
             // Stop UpdateVoteList if it's running
@@ -77,7 +64,7 @@ namespace XLMultiMapVote
                 StopCoroutine(updateVoteListCoroutine);
                 updateVoteListCoroutine = null; // Set to null so it can be restarted again
 
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Update Vote List Stopped", 1.5f);
+                //MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Update Vote List Stopped", 1.5f);
             }
         }
 
@@ -88,26 +75,15 @@ namespace XLMultiMapVote
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.mapListEmptyError, 1.5f);
                 return;
             }
-            if (isMapChanging) return; // return if map change is already queued
+            if (MapHelper.isMapChanging) return; // return if map change is already queued
 
-            isMapChanging = true;
+            MapHelper.Set_isMapChanging(true);
 
             ShowPlayerPopUp(Labels.popUpMessage, true, Main.settings.popUpTime);
-            ShowMessage(Labels.changeMapMessage, 5f);
+            ShowMessage(Labels.voteStartedMessage, 5f);
             StartCountdown(Main.settings.popUpTime);
 
             StartMapChangeRoutines(); // start routines after pop ups for things are not null
-        }
-        private void ForEachPlayer(PlayerAction action)
-        {
-            foreach (KeyValuePair<int, NetworkPlayerController> entry in MultiplayerManager.Instance.networkPlayers)
-            {
-                NetworkPlayerController player = entry.Value;
-                if (player)
-                {
-                    action(player);
-                }
-            }
         }
         public IEnumerator ChangeMap()
         {
@@ -115,7 +91,7 @@ namespace XLMultiMapVote
 
             try
             {
-                if (isMapChanging)
+                if (MapHelper.isMapChanging)
                 {
                     string votedMap = GetVotedMap();
                     LevelInfo mapInfo = MapHelper.GetMapInfo(votedMap);
@@ -123,12 +99,15 @@ namespace XLMultiMapVote
 
                     if (!string.IsNullOrEmpty(votedMap) && MapHelper.nextLevelInfo != null)
                     {
-                        ShowMessage(Labels.changetoMessage + votedMap, 3f);
+                        //ShowMessage(Labels.mapChangedMessage + votedMap, 3f);
+
                         //LevelManager.Instance.LoadLevel(mapInfo);
                         //LevelManager.Instance.PlayLevel(MapHelper.nextLevelInfo);
                         MultiplayerManager.Instance.LoadLevel(MapHelper.nextLevelInfo);
+
                         ClearPopUpOptions();
-                        Set_hasMapChangedByVote(true);
+
+                        MapHelper.Set_hasMapChangedByVote(true);
                     }
                     else
                     {
@@ -144,7 +123,7 @@ namespace XLMultiMapVote
             }
             finally
             {
-                isMapChanging = false;
+                MapHelper.Set_isMapChanging(false);
             }
 
             yield return null;
@@ -162,7 +141,7 @@ namespace XLMultiMapVote
                 CancelMapChangeForSelf();
             }
 
-            isMapChanging = false;
+            MapHelper.Set_isMapChanging(false);
         }
 
         private void CancelMapChangeOverNetwork()
@@ -188,7 +167,35 @@ namespace XLMultiMapVote
 
             //MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"Voting cancelled", 1.5f); // remove later
         }
+        private void ForEachPlayer(PlayerAction action)
+        {
+            foreach (KeyValuePair<int, NetworkPlayerController> entry in MultiplayerManager.Instance.networkPlayers)
+            {
+                NetworkPlayerController player = entry.Value;
+                if (player)
+                {
+                    action(player);
+                }
+            }
+        }
+        public void StartCountdown(float time)
+        {
+            ForEachPlayer(player => player.ShowCountdown(time));
+        }
+        public void StopCountdown()
+        {
+            ForEachPlayer(player => player.ShowCountdown(0.1f));
+        }
 
+        public void ShowMessage(string message, float time)
+        {
+            ForEachPlayer(player => player.ShowMessage(message, time));
+        }
+
+        public void ShowVoteList(Objective[] votelist)
+        {
+            ForEachPlayer(player => player.ShowObjectivesList(votelist));
+        }
         public void ShowPlayerPopUp(string message, bool pauseGame, float time)
         {
             HandlePopUpCallBack(); // initializes the call back and records the players answer.
@@ -198,7 +205,6 @@ namespace XLMultiMapVote
 
             ForEachPlayer(player => player.ShowPopup(message, popUpOptions, popUpCallBack, pauseGame, time));
         }
-
         private void HandlePopUpCallBack()
         {
             popUpCallBack = (optionIndex) => {
@@ -294,6 +300,28 @@ namespace XLMultiMapVote
             ShowMessage(Labels.tiedMapMessage, 5f);
             return chosenMap;
         }
+        private IEnumerator UpdateVoteList()
+        {
+            float countdown = Traverse.Create(CountdownUI.Instance).Field("durationLeft").GetValue<float>();
+
+            while (countdown > 0.0f)
+            {
+                yield return new WaitForSecondsRealtime(0.5f);
+
+                Objective[] votelist = ConvertToVoteList(GetVoteList());
+                if (votelist == null)
+                {
+                    ShowVoteList(Array.Empty<Objective>());
+                    yield return null;
+                }
+                else
+                {
+                    ShowVoteList(votelist);
+                    yield return null; // Allows the loop to be more responsive
+                }
+            }
+            yield return null;
+        }
         private void PopulateVoteIndex()
         {
             if (popUpOptions.Length <= 0)
@@ -340,74 +368,6 @@ namespace XLMultiMapVote
             }
             return null;
         }
-        private IEnumerator UpdateVoteList()
-        {
-            float countdown = Traverse.Create(CountdownUI.Instance).Field("durationLeft").GetValue<float>();
-
-            while (countdown > 0.0f)
-            {
-                yield return new WaitForSecondsRealtime(0.5f);
-               
-                Objective[] votelist = ConvertToVoteList(GetVoteList());
-                if (votelist == null)
-                {
-                    ShowVoteList(Array.Empty<Objective>());
-                    yield return null;
-                }
-                else
-                {
-                    ShowVoteList(votelist);
-                    yield return null; // Allows the loop to be more responsive
-                }
-            }
-            yield return null;
-        }
-        /* old updatevotelist not needed
-        private IEnumerator UpdateVoteList()
-        {
-            float countdown;
-            if (float.TryParse(CountdownUI.Instance.text.text, out countdown))
-            {
-                while (countdown > 0.0f)
-                {
-                    yield return new WaitForSecondsRealtime(0.5f);
-                    if (CountdownUI.Instance.text.text == null || !float.TryParse(CountdownUI.Instance.text.text, out countdown))
-                    {
-                        yield break;
-                    }
-                    Objective[] votelist = ConvertToVoteList(GetVoteList());
-                    if (votelist == null)
-                    {
-                        ShowVoteList(Array.Empty<Objective>());
-                        yield return null;
-                    }
-                    else
-                    {
-                        ShowVoteList(votelist);
-                        yield return null; // Allows the loop to be more responsive
-                    }
-                }
-            }
-            yield return null;
-        }
-        */
-        public void StartCountdown(float time)
-        {
-            ForEachPlayer(player => player.ShowCountdown(time));
-        }
-        public void StopCountdown()
-        {
-            ForEachPlayer(player => player.ShowCountdown(0.1f));
-        }
-
-        public void ShowMessage(string message, float time)
-        {
-            ForEachPlayer(player => player.ShowMessage(message, time));
-        }
-
-        public void ShowVoteList(Objective[] votelist)
-        {
-            ForEachPlayer(player => player.ShowObjectivesList(votelist));
-        }
+        
     }
 }

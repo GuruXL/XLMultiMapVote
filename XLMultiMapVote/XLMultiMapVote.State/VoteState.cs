@@ -2,6 +2,7 @@
 using GameManagement;
 using ModIO.UI;
 using XLMultiMapVote.Data;
+using XLMultiMapVote.Map;
 
 namespace XLMultiMapVote.State
 {
@@ -16,7 +17,7 @@ namespace XLMultiMapVote.State
 				RequestTransitionBack();
 				return;
 			}
-			else if (Main.multiMapVote.isMapChanging)
+			else if (MapHelper.isMapChanging)
             {
 				MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.voteInProgressError, 2.5f);
 				//GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);

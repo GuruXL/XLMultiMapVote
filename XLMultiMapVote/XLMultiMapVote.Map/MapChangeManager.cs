@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using XLMultiMapVote;
+using XLMultiMapVote.Data;
 
 namespace XLMultiMapVote.Map
 {
@@ -29,22 +30,22 @@ namespace XLMultiMapVote.Map
 
             if (PhotonNetwork.IsMasterClient)
             {
-                MapHelper.SetCurrentLevel(levelInfo, true);
+                MapHelper.SetCurrentLevel(levelInfo, false);
 
-                if (MapHelper.HasMapChanged() && Main.multiMapVote.hasMapChangedByVote)
+                if (MapHelper.HasMapChanged() && MapHelper.hasMapChangedByVote)
                 {
                     Main.multiMapVote.StopMapChangeRoutines();
 
                     PlayerController.Instance.respawn.ForceRespawn();
 
-                    MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"Level Changed By Vote To : {levelInfo.name}", 1.5f);
-                    Main.Logger.Log($"Level Changed By Vote To : {levelInfo.name}");
+                    MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.mapChangedMessage + levelInfo.name, 1.5f);
+                    Main.Logger.Log(Labels.mapChangedMessage + levelInfo.name);
 
-                    Main.multiMapVote.Set_hasMapChangedByVote(false);
+                    MapHelper.Set_hasMapChangedByVote(false);
                 }
             }
 
-            Main.Logger.Log("HandleLevelChanged Called");
+            //Main.Logger.Log("HandleLevelChanged Called");
         }
     }
 }
