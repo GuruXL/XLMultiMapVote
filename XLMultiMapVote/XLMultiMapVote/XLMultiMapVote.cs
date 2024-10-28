@@ -80,7 +80,7 @@ namespace XLMultiMapVote
             MapHelper.Set_isMapChanging(true);
 
             ShowPlayerPopUp(Labels.popUpMessage, true, Main.settings.popUpTime);
-            ShowMessage(Labels.voteStartedMessage, 5f);
+            ShowMessage(Labels.voteStartedMessage, 3.5f);
             StartCountdown(Main.settings.popUpTime);
 
             StartMapChangeRoutines(); // start routines after pop ups for things are not null
@@ -95,15 +95,15 @@ namespace XLMultiMapVote
                 {
                     string votedMap = GetVotedMap();
                     LevelInfo mapInfo = MapHelper.GetMapInfo(votedMap);
-                    MapHelper.SetNextLevel(mapInfo);
 
-                    if (!string.IsNullOrEmpty(votedMap) && MapHelper.nextLevelInfo != null)
+                    if (!string.IsNullOrEmpty(votedMap) && mapInfo != null)
                     {
-                        //ShowMessage(Labels.mapChangedMessage + votedMap, 3f);
+                        MapHelper.SetNextLevel(mapInfo);
+                        ShowMessage(Labels.voteCompleteMessage + votedMap, 1.5f);
 
                         //LevelManager.Instance.LoadLevel(mapInfo);
                         //LevelManager.Instance.PlayLevel(MapHelper.nextLevelInfo);
-                        MultiplayerManager.Instance.LoadLevel(MapHelper.nextLevelInfo);
+                        MultiplayerManager.Instance.LoadLevel(mapInfo);
 
                         ClearPopUpOptions();
 
@@ -112,7 +112,8 @@ namespace XLMultiMapVote
                     else
                     {
                         // Handle invalid map error
-                        MessageSystem.QueueMessage(MessageDisplayData.Type.Error, Labels.invalidMapError, 2.5f);
+                        CancelVote(true);
+                        MessageSystem.QueueMessage(MessageDisplayData.Type.Error, Labels.invalidMapError, 2.0f);
                         Main.Logger.Log(Labels.invalidMapError);
                     }
                 }   
@@ -147,7 +148,7 @@ namespace XLMultiMapVote
         private void CancelMapChangeOverNetwork()
         {
             ShowPlayerPopUp(Labels.voteCancelError, false, 1f);
-            ShowMessage(Labels.voteCancelError, 5f);
+            ShowMessage(Labels.voteCancelError, 3.0f);
             StopCountdown();
             ShowVoteList(Array.Empty<Objective>());
         }
@@ -221,6 +222,8 @@ namespace XLMultiMapVote
                 voteIndex[optionIndex]++;
             }
         }
+
+        /* GetOptionName() not needed anymore
         public string GetOptionName(int index)
         {
             // Check if the index is within the bounds of the popUpOptions array
@@ -233,13 +236,14 @@ namespace XLMultiMapVote
                 return "Option";
             }
         }
+        */
+
         public void AddMapToOptions(string selectedMap)
         {
             if (string.IsNullOrEmpty(selectedMap))
             {
                 return;
             }
-
             // This means the map is not null, empty, and not found in the existing array
             var popUpOptionsList = new List<string>(popUpOptions);
             if (popUpOptionsList.Contains(selectedMap))
@@ -261,7 +265,7 @@ namespace XLMultiMapVote
         }
         private string GetVotedMap()
         {
-            if (voteIndex.Count <= 0)
+            if (voteIndex.Count == 0)
             {
                 return null; // No votes have been cast
             }
@@ -286,7 +290,8 @@ namespace XLMultiMapVote
                 }
             }
 
-            if (tiedOptions.Count == 1 && popUpOptions.Length > 1) // If there is only one option with the highest votes, return it
+            // Return the option if thereis a winner
+            if (tiedOptions.Count == 1 && popUpOptions.Length > 1)
             {
                 int chosenIndex = tiedOptions[0];
                 if (chosenIndex >= 0 && chosenIndex < popUpOptions.Length)
@@ -295,10 +300,9 @@ namespace XLMultiMapVote
                 }
             }
 
-            // Handle the tie case by using the existing method
-            string chosenMap = MapHelper.ChooseMapOnTie(voteIndex, popUpOptions);
-            ShowMessage(Labels.tiedMapMessage, 5f);
-            return chosenMap;
+            // Handle case that there is more than one winner
+            ShowMessage(Labels.tiedMapMessage, 2.5f);
+            return MapHelper.ChooseMapOnTie(voteIndex, popUpOptions);
         }
         private IEnumerator UpdateVoteList()
         {

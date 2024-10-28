@@ -5,11 +5,13 @@
         //Popups
         public const string popUpMessage = "Vote for the next map!";
 
-        public const string voteStartedMessage = "Voting in progress... The map will change when the timer ends.";
+        public const string voteStartedMessage = "Voting in progress... The map will change when the timer ends."; 
 
-        public const string mapChangedMessage = "Map Changed By Vote To : ";
+        public const string voteCompleteMessage = "Voting complete! The selected map is: ";
 
         public const string tiedMapMessage = "There has been a tie! A random map will be chosen from the winners.";
+
+        public const string mapChangedMessage = "Map changed by vote to: ";
 
         // UI
         public const string addMapText = "Select Map to Add";

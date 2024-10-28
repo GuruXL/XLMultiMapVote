@@ -38,14 +38,12 @@ namespace XLMultiMapVote.Map
 
                     PlayerController.Instance.respawn.ForceRespawn();
 
-                    MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.mapChangedMessage + levelInfo.name, 1.5f);
+                    //MessageSystem.QueueMessage(MessageDisplayData.Type.Success, Labels.mapChangedMessage + levelInfo.name, 2.0f);
                     Main.Logger.Log(Labels.mapChangedMessage + levelInfo.name);
 
                     MapHelper.Set_hasMapChangedByVote(false);
                 }
             }
-
-            //Main.Logger.Log("HandleLevelChanged Called");
         }
     }
 }
