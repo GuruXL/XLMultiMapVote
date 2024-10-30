@@ -2,9 +2,10 @@
 using Photon.Pun;
 
 namespace XLMultiMapVote.Patches
-{ 
-    [HarmonyPatch(typeof(NetworkPlayerController))]
-    [HarmonyPatch("ShowObjectivesList")]
+{
+    /*
+    [HarmonyPatch(typeof(MultiplayerManager))]
+    [HarmonyPatch("ShowObjectiveslist")]
     class ShowObjectivesListPatch
     {
         public static bool Prefix()
@@ -19,5 +20,5 @@ namespace XLMultiMapVote.Patches
             }
         }
     }
-    
+    */
 }

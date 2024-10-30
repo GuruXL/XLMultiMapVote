@@ -17,7 +17,7 @@ namespace XLMultiMapVote.State
 				RequestTransitionBack();
 				return;
 			}
-			else if (MapHelper.isMapChanging)
+			else if (MapHelper.isVoteInProgress)
             {
 				MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.voteInProgressError, 2.5f);
 				//GameStateMachine.Instance.RequestTransitionTo(GameStateMachine.Instance.LastState);
@@ -56,7 +56,9 @@ namespace XLMultiMapVote.State
 			}
 			else if (RewiredInput.PrimaryPlayer.GetButtonDown("B"))
 			{
-				if (Main.uiController.uiDropDownList.IsExpanded || Main.uiController.filterMapsInput.isFocused)
+				if (Main.uiController.uiDropDownList.IsExpanded 
+					|| Main.uiController.filterMapsInput.isFocused 
+					|| Main.uiController.timerInput.isFocused)
 				{
 					return;
                 }

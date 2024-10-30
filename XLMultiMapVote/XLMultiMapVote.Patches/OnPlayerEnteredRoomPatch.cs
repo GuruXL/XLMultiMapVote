@@ -3,19 +3,21 @@ using SkaterXL.Multiplayer;
 using UnityEngine;
 using Photon.Pun;
 using XLMultiMapVote.Map;
+using ExitGames.Client.Photon;
+using Photon.Realtime;
 
 namespace XLMultiMapVote.Patches
 {
     /*
     [HarmonyPatch(typeof(MultiplayerManager))]
-    [HarmonyPatch("OnJoinedRoom")]
-    public static class OnJoinedRoomPatch
+    [HarmonyPatch("OnPlayerEnteredRoom")]
+    public static class OnPlayerEnteredRoomPatch
     {
-        public static void Postfix()
+        public static void Postfix(Player newPlayer)
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                MapHelper.SetCurrentLevel(LevelManager.Instance.currentLevel, true);
+                Main.mapChangeManager.SendOnPlayerEnterEvent(newPlayer);
             }
         }
     }

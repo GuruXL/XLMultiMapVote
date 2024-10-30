@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
+using Photon.Realtime;
 using SkaterXL.Multiplayer;
+using UnityEngine;
 
 namespace XLMultiMapVote.Patches
 {
@@ -7,15 +9,24 @@ namespace XLMultiMapVote.Patches
     [HarmonyPatch("IsPlayerAllegibleToControl")]
     public static class CheatDetectionPatch
     {
-        public static bool Prefix(CheatDetection.ControlType type, ref bool __result)
+        static bool Prefix(Player sender, Player controlledPlayer, CheatDetection.ControlType type, ref bool __result)
         {
-            if (type == CheatDetection.ControlType.Popup && !Main.settings.disableVotingForSelf)
+            if (sender == null || controlledPlayer == null)
             {
-                __result = true; // Bypass cheat detection
-                //Main.Logger.Log("Cheat Detection Bypassed");
-                return false; // Skip the original method
+                // Let the original method handle null cases
+                return true;
             }
-            return true; // continue with the original method
+
+            if (type == CheatDetection.ControlType.Popup && !Main.settings.disableVotingPopup)
+            {
+                __result = true; // Bypass Detection
+                return false;    // Skip the original method
+            }
+            else
+            {
+                // allow the cheat detection to run as normal
+                return true;
+            }
         }
     }
 }

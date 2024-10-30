@@ -143,13 +143,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="XLMultiMapVote.Map\MapChangeManager2.cs" />
     <Compile Include="XLMultiMapVote.Map\MapChangeManager.cs" />
+    <Compile Include="XLMultiMapVote.Patches\OnPlayerEnteredRoomPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnJoinedRoomPatch.cs" />
+    <Compile Include="XLMultiMapVote.Patches\OnEnableMenuPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\ShowObjectivesListPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnMasterClientSwitchedPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnLeftRoomPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
     <Compile Include="XLMultiMapVote.UI\Components\DisableNavigationOnFocus.cs" />
+    <Compile Include="XLMultiMapVote.UI\PopupMenuManager.cs" />
     <Compile Include="XLMultiMapVote.UI\MenuButtonManager.cs" />
     <Compile Include="XLMultiMapVote.UI\Components\ScrollRectAutoScroll.cs" />
     <Compile Include="XLMultiMapVote.UI\UIController.cs" />
@@ -193,5 +197,6 @@
     </None>
     <EmbeddedResource Include="Resources\mapvoteui" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

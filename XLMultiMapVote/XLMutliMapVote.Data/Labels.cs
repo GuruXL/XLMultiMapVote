@@ -27,7 +27,9 @@
 
         public const string voteInProgressError = "Please wait until the current vote is complete";
 
-        public const string voteCancelError = "Voting has been cancelled - the map will no longer change";
+        public const string voteNotInProgressError = "No vote in progress";
+
+        public const string voteCancelError = "Voting has been cancelled - the map will no longer change"; 
 
         public const string mapListEmptyError = "Cannot queue vote - Map list must have a minimum of 2 maps.";
 

@@ -2,17 +2,18 @@
 using Photon.Pun;
 using Photon.Realtime;
 using ModIO.UI;
+using XLMultiMapVote.Map;
 
 namespace XLMultiMapVote.Patches
 {
-    
+    /*
     [HarmonyPatch(typeof(MultiplayerManager))]
     [HarmonyPatch("OnMasterClientSwitched")]
     class OnMasterClientSwitchedPatch
     {
         public static void Postfix(Player newMasterClient)
         {
-            if (!PhotonNetwork.IsConnected && !PhotonNetwork.InRoom || PhotonNetwork.CurrentRoom == null)
+            if (!MapHelper.isVoteInProgress && !PhotonNetwork.InRoom || PhotonNetwork.CurrentRoom == null)
             {
                 return;
             }
@@ -29,5 +30,5 @@ namespace XLMultiMapVote.Patches
             }
         }
     }
-    
+    */
 }

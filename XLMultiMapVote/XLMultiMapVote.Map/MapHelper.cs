@@ -7,25 +7,25 @@ namespace XLMultiMapVote.Map
     public static class MapHelper
     {
         public static List<LevelInfo> combinedMapList = new List<LevelInfo>();
-        public static string[] mapNames;
+        public static string[] mapNames { get; private set; }
         public static LevelInfo currentLevelInfo { get; private set; }
         public static LevelInfo nextLevelInfo { get; private set; }
 
-        private static bool _isMapChanging = false;
+        private static bool _isVoteInProgress = false;
         private static bool _hasMapChangedByVote = false;
-        public static bool isMapChanging
+        public static bool isVoteInProgress
         {
-            get { return _isMapChanging; }
-            private set { _isMapChanging = value; }
-        }
-        public static void Set_isMapChanging(bool status)
-        {
-            _isMapChanging = status;
+            get { return _isVoteInProgress; }
+            private set { _isVoteInProgress = value; }
         }
         public static bool hasMapChangedByVote
         {
             get { return _hasMapChangedByVote; }
             private set { _hasMapChangedByVote = value; }
+        }
+        public static void Set_isVoteInProgress(bool status)
+        {
+            _isVoteInProgress = status;
         }
         public static void Set_hasMapChangedByVote(bool status)
         {

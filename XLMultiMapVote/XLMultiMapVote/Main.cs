@@ -26,6 +26,7 @@ namespace XLMultiMapVote
         public static XLMultiMapVote multiMapVote;
         public static MapChangeManager mapChangeManager;
         public static MenuButtonManager menuButtonManager;
+        public static PopupMenuManager popupMenuManager;
         public static UIController uiController;
 
         public static bool Load(UnityModManager.ModEntry modEntry)
@@ -57,12 +58,7 @@ namespace XLMultiMapVote
 
             GUILayout.BeginHorizontal();
             RGUI.BeginBackgroundColor(Color.white);
-            settings.disableVotingForSelf = GUILayout.Toggle(settings.disableVotingForSelf, "Disable Voting For Self", GUILayout.Width(186));
-            GUILayout.Space(6);
-            if (GUILayout.Button("Clear UI", RGUIStyle.button, GUILayout.Width(128)))
-            {
-                multiMapVote.CancelVote(false);
-            }
+            settings.disableVotingPopup = GUILayout.Toggle(settings.disableVotingPopup, "Disable Voting Popup", GUILayout.Width(186));
             RGUI.EndBackgroundColor();
             GUILayout.EndHorizontal();
 
@@ -164,6 +160,7 @@ namespace XLMultiMapVote
                     multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
                     mapChangeManager = ScriptManager.AddComponent<MapChangeManager>();
                     menuButtonManager = ScriptManager.AddComponent<MenuButtonManager>();
+                    popupMenuManager = ScriptManager.AddComponent<PopupMenuManager>();
                     uiController = ScriptManager.AddComponent<UIController>();
                     Object.DontDestroyOnLoad(ScriptManager);
 

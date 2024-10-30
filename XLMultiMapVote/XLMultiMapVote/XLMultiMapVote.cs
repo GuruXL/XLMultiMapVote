@@ -10,6 +10,7 @@ using XLMultiMapVote.Map;
 using XLMultiMapVote.State;
 using HarmonyLib;
 using MapEditor;
+using Photon.Pun;
 
 namespace XLMultiMapVote
 {
@@ -75,9 +76,11 @@ namespace XLMultiMapVote
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.mapListEmptyError, 1.5f);
                 return;
             }
-            if (MapHelper.isMapChanging) return; // return if map change is already queued
+            if (MapHelper.isVoteInProgress) return; // return if map change is already queued
 
-            MapHelper.Set_isMapChanging(true);
+            //MapHelper.Set_isMapChanging(true);
+            //Main.mapChangeManager.SendMapChangeEvent(true);
+            Main.mapChangeManager.SendVoteInProgressEvent(true);
 
             ShowPlayerPopUp(Labels.popUpMessage, true, Main.settings.popUpTime);
             ShowMessage(Labels.voteStartedMessage, 3.5f);
@@ -91,7 +94,7 @@ namespace XLMultiMapVote
 
             try
             {
-                if (MapHelper.isMapChanging)
+                if (MapHelper.isVoteInProgress)
                 {
                     string votedMap = GetVotedMap();
                     LevelInfo mapInfo = MapHelper.GetMapInfo(votedMap);
@@ -124,7 +127,9 @@ namespace XLMultiMapVote
             }
             finally
             {
-                MapHelper.Set_isMapChanging(false);
+                //MapHelper.Set_isMapChanging(false);
+                //Main.mapChangeManager.SendMapChangeEvent(false);
+                Main.mapChangeManager.SendVoteInProgressEvent(false);
             }
 
             yield return null;
@@ -142,9 +147,16 @@ namespace XLMultiMapVote
                 CancelMapChangeForSelf();
             }
 
-            MapHelper.Set_isMapChanging(false);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                Main.mapChangeManager.SendVoteInProgressEvent(false);
+            }
+            else
+            {
+                MapHelper.Set_isVoteInProgress(false);
+            }
         }
-
+        
         private void CancelMapChangeOverNetwork()
         {
             ShowPlayerPopUp(Labels.voteCancelError, false, 1f);
@@ -157,9 +169,7 @@ namespace XLMultiMapVote
             ClearPopUpOptions();
             StopMapChangeRoutines();
 
-            ObjectiveListController.Instance.Hide();
-            CountdownUI.Instance.StopCountdown();
-            MultiplayerManager.Instance.gameModePopup.gameObject.SetActive(false);
+            HideUI();
 
             if (!InputController.Instance.controlsActive) // OnDisable is not being called on gameModePopup, This is Temp fix for frozen player controls
             {
@@ -167,6 +177,12 @@ namespace XLMultiMapVote
             }
 
             //MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"Voting cancelled", 1.5f); // remove later
+        }
+        public void HideUI()
+        {
+            ObjectiveListController.Instance.Hide();
+            CountdownUI.Instance.StopCountdown();
+            MultiplayerManager.Instance.gameModePopup.gameObject.SetActive(false);
         }
         private void ForEachPlayer(PlayerAction action)
         {

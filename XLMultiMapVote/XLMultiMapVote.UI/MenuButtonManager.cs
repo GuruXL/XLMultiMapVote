@@ -7,6 +7,9 @@ using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
 using XLMultiMapVote.Map;
 using System.Linq;
+using Photon.Pun;
+using HarmonyLib;
+using System.Reflection;
 
 namespace XLMultiMapVote.UI
 {
@@ -54,20 +57,29 @@ namespace XLMultiMapVote.UI
         {
             try
             {
-                //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Players Button");
-                //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Join Next Map Button");
-                //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Start Game Mode");
-
-                menuButtonPrefab = GetMultiplayerMenuButton();
-
                 if (menuButtonPrefab == null)
                 {
-                    Main.Logger.Error("menuButtonPrefab Not Found");
-                }
+                    //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Players Button");
+                    //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Join Next Map Button");
+                    //menuButtonPrefab = MultiplayerManager.Instance.menuController.mainMenu.transform.FindChildRecursively("Start Game Mode");
+
+                    menuButtonPrefab = GetMultiplayerMenuButton();
+                }   
             }
             catch (Exception ex)
             {
                 Main.Logger.Error($"Error Finding MainMenuButton Prefab - {ex.Message}");
+            }
+            finally
+            {
+                if (menuButtonPrefab != null)
+                {
+                    Main.Logger.Log("menuButtonPrefab has been found");
+                }
+                else
+                {
+                    Main.Logger.Error("menuButtonPrefab Not Found");
+                }
             }
         }
 
@@ -109,7 +121,18 @@ namespace XLMultiMapVote.UI
             }
             catch (Exception ex)
             {
-                Main.Logger.Error($"Failed to Create Vote Button - {ex.Message}");
+                Main.Logger.Error($"Error Creating Vote Button - {ex.Message}");
+            }
+            finally
+            {
+                if (customMenuButton != null)
+                {
+                    Main.Logger.Log("Vote Button has been created or already exists");
+                }
+                else
+                {
+                    Main.Logger.Error("Failed to create Vote Button");
+                }
             }
 
         }
@@ -146,7 +169,7 @@ namespace XLMultiMapVote.UI
 
                     cancelButtonVisibility = new MultiplayerMainMenu.ButtonVisibilityDef();
                     cancelButtonVisibility.buttonGO = cancelVoteButton.gameObject;
-                    cancelButtonVisibility.showOnlyForMasterClient = true;
+                    cancelButtonVisibility.showOnlyForMasterClient = false;
                     cancelButtonVisibility.showInLobby = false;
                     cancelButtonVisibility.showInPublicRoom = true;
                     cancelButtonVisibility.showInPrivateRoom = true;
@@ -158,10 +181,22 @@ namespace XLMultiMapVote.UI
             }
             catch (Exception ex)
             {
-                Main.Logger.Error($"Failed to Create Cancel Button - {ex.Message}");
+                Main.Logger.Error($"Error Creating Cancel Button - {ex.Message}");
+            }
+            finally
+            {
+                if (cancelVoteButton != null)
+                {
+                    Main.Logger.Log("Cancel Button has been created or already exists");
+                }
+                else
+                {
+                    Main.Logger.Error("Failed to create Cancel Button");
+                }
             }
 
         }
+        
         public void DestroyButtons()
         {
             try
@@ -197,13 +232,21 @@ namespace XLMultiMapVote.UI
         }
         private void CancelButtonOnClick()
         {
-            if (!MapHelper.isMapChanging)
+            if (!MapHelper.isVoteInProgress)
             {
-                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, $"No Vote in Progress", 2.5f);
+                MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.voteNotInProgressError, 2.0f);
                 return;
             }
 
-            Main.multiMapVote.CancelVote(true);
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                //Main.multiMapVote.CancelVote(false);
+                AccessTools.Method(typeof(MultiplayerGameModePopup), "TimeOut").Invoke(MultiplayerManager.Instance.gameModePopup, null);
+            }
+            else
+            {
+                Main.multiMapVote.CancelVote(true);
+            }
         }
     }
 }

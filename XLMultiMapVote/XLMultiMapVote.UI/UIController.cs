@@ -34,7 +34,7 @@ namespace XLMultiMapVote.UI
         private Button exitButton;
 
         public TMP_InputField filterMapsInput{ get; private set; }
-        private TMP_InputField timerInput;
+        public TMP_InputField timerInput { get; private set; }
 
         private Canvas MapVoteListCanvas;
         private CanvasScaler voteListScaler;
@@ -371,36 +371,11 @@ namespace XLMultiMapVote.UI
             newListItem.name = mapName;
             mapLabelList.Add(newListItem);
         }
-        /* old version new on need for TMP
-        private void CreateMapListLabel(string mapName)
-        {
-            if (string.IsNullOrEmpty(mapName) || mapName.Contains(Labels.addMapText))
-            {
-                return;
-            }
-
-            foreach (Text label in mapLabelList)
-            {
-                if (label.text == mapName)
-                {
-                    return; // skip creation if new label is a duplicate.
-                }
-            }
-
-            GameObject newListObj = Instantiate(mapLabelPrefab.gameObject, mapLabelPrefab.gameObject.transform.parent);
-            newListObj.SetActive(true);
-            Text newListItem = newListObj.GetComponent<Text>();
-            newListItem.text = mapName;
-            newListItem.name = mapName;
-            mapLabelList.Add(newListItem);
-        }
-        */
-
         private void ClearMapLabels()
         {
             if (mapLabelList?.Count <= 0)
             {
-                Main.Logger.Log($"Map Label List is Empty");
+                //Main.Logger.Warning($"Map Label List is Empty");
                 return;
             }
             else
