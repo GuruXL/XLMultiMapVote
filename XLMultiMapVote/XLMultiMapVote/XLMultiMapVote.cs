@@ -168,13 +168,8 @@ namespace XLMultiMapVote
         {
             ClearPopUpOptions();
             StopMapChangeRoutines();
-
             HideUI();
-
-            if (!InputController.Instance.controlsActive) // OnDisable is not being called on gameModePopup, This is Temp fix for frozen player controls
-            {
-                InputController.Instance.controlsActive = true;
-            }
+            ControlsHelper.EnableActiveControls(true);
 
             //MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"Voting cancelled", 1.5f); // remove later
         }
@@ -182,7 +177,8 @@ namespace XLMultiMapVote
         {
             ObjectiveListController.Instance.Hide();
             CountdownUI.Instance.StopCountdown();
-            MultiplayerManager.Instance.gameModePopup.gameObject.SetActive(false);
+            //MultiplayerManager.Instance.gameModePopup.gameObject.SetActive(false);
+            AccessTools.Method(typeof(MultiplayerGameModePopup), "TimeOut").Invoke(MultiplayerManager.Instance.gameModePopup, null);
         }
         private void ForEachPlayer(PlayerAction action)
         {
@@ -337,7 +333,7 @@ namespace XLMultiMapVote
                 else
                 {
                     ShowVoteList(votelist);
-                    yield return null; // Allows the loop to be more responsive
+                    yield return null;
                 }
             }
             yield return null;

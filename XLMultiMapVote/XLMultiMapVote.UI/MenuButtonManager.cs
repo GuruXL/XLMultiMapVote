@@ -48,8 +48,7 @@ namespace XLMultiMapVote.UI
             //var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options
             //.LastOrDefault(go => go.buttonGO.GetComponent<MenuButton>());
 
-            var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options
-                .ElementAtOrDefault(7);
+            var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options.ElementAtOrDefault(7);
 
             return firstActiveGO?.buttonGO;
         }
@@ -242,11 +241,14 @@ namespace XLMultiMapVote.UI
             {
                 //Main.multiMapVote.CancelVote(false);
                 AccessTools.Method(typeof(MultiplayerGameModePopup), "TimeOut").Invoke(MultiplayerManager.Instance.gameModePopup, null);
+                ControlsHelper.EnableActiveControls(true);
             }
             else
             {
                 Main.multiMapVote.CancelVote(true);
             }
+
+            GameStateMachine.Instance.RequestPlayState();
         }
     }
 }

@@ -23,6 +23,7 @@ namespace XLMultiMapVote.Map
                 SetRoomProperties(false);  // Initialize to false on Master Client
             }
         }
+
         private void OnDestroy()
         {
             LevelManager.Instance.OnLevelChanged -= HandleLevelChanged;
