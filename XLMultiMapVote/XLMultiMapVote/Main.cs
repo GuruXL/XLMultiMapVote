@@ -23,7 +23,7 @@ namespace XLMultiMapVote
         public static UnityModManager.ModEntry modEntry;
         public static Settings settings;
         public static GameObject ScriptManager;
-        public static XLMultiMapVote multiMapVote;
+        public static VoteController voteController;
         public static MapChangeManager mapChangeManager;
         public static MenuButtonManager menuButtonManager;
         public static PopupMenuManager popupMenuManager;
@@ -157,7 +157,7 @@ namespace XLMultiMapVote
                     harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
 
                     ScriptManager = new GameObject("XLMultiMapVote");
-                    multiMapVote = ScriptManager.AddComponent<XLMultiMapVote>();
+                    voteController = ScriptManager.AddComponent<VoteController>();
                     mapChangeManager = ScriptManager.AddComponent<MapChangeManager>();
                     menuButtonManager = ScriptManager.AddComponent<MenuButtonManager>();
                     popupMenuManager = ScriptManager.AddComponent<PopupMenuManager>();

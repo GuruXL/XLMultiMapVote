@@ -8,32 +8,32 @@ namespace XLMultiMapVote.State
 {
 	public class PopUpState : GameState
 	{
-        
+		private GameState[] _availableTransitions;
+		public new GameState[] availableTransitions
+		{
+			get
+			{
+				if (_availableTransitions == null)
+				{
+					_availableTransitions = new GameState[]
+					{
+					GameStateMachine.Instance.PlayObject.GetComponent<GameState>(),
+					GameStateMachine.Instance.PauseObject.GetComponent<GameState>(),
+					GameStateMachine.Instance.MultiplayerMenuObject.GetComponent<GameState>()
+					};
+				}
+				return _availableTransitions;
+			}
+		}
+
 		public override void OnEnter(GameState prevState)
 		{
-          
         }
 		public override void OnExit(GameState nextState)
-		{
-           
+		{       
         }
 		public override void OnUpdate()
 		{
-
-		}
-
-
-		public void SetAvailableTransitions()
-		{
-			// Initialize the transitions array with the desired states directly
-			GameState[] transitions = new GameState[]
-			{
-				GameStateMachine.Instance.PlayObject.GetComponent<GameState>(),
-				GameStateMachine.Instance.PauseObject.GetComponent<GameState>(),
-				GameStateMachine.Instance.MultiplayerMenuObject.GetComponent<GameState>()
-			};
-
-			availableTransitions = transitions;
 		}
 	}
 }

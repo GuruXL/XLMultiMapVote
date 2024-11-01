@@ -1,17 +1,19 @@
 ﻿using HarmonyLib;
-using MapEditor;
 using System;
+using GameManagement;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.Events;
-using XLMultiMapVote.Data;
+using XLMultiMapVote.State;
 
 namespace XLMultiMapVote.UI
 {
     
     public class PopupMenuManager : MonoBehaviour
     {
+        GameState popUpState;
+
         RectTransform popupOptionsRect;
+
         public MultiplayerGameModePopup popupUI
         {
             get
@@ -21,11 +23,12 @@ namespace XLMultiMapVote.UI
         }
         private void Awake()
         {
-            //popupMenu = GetPopupMenu();
-            popupOptionsRect = GetPopupOptionsRect();
         }
         private void Start()
         {
+            popUpState = popupUI.gameObject.AddComponent<PopUpState>();
+
+            popupOptionsRect = GetPopupOptionsRect();
             SetPopUpOptionsRectSize(0, 720);
         }
         private RectTransform GetPopupOptionsRect() 

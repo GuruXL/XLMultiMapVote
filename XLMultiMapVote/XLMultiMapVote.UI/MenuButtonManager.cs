@@ -89,7 +89,7 @@ namespace XLMultiMapVote.UI
                 if (customMenuButton == null)
                 {
                     GameObject newButton = Instantiate(menuButtonPrefab, menuButtonPrefab.transform.parent);
-                    newButton.transform.SetSiblingIndex(menuButtonPrefab.gameObject.transform.GetSiblingIndex() - 1); // adds new button one place below button prefab
+                    newButton.transform.SetSiblingIndex(menuButtonPrefab.gameObject.transform.GetSiblingIndex() - 1); // adds new button above button prefab
                     //newButton.transform.SetAsFirstSibling();
                     //newButton.transform.SetAsLastSibling();
                     newButton.name = Labels.menuButtonLabel;
@@ -227,7 +227,7 @@ namespace XLMultiMapVote.UI
         }
         private void MenuButtonOnClick()
         {
-            GameStateMachine.Instance.RequestTransitionTo(Main.multiMapVote.voteState, true);
+            GameStateMachine.Instance.RequestTransitionTo(Main.voteController.voteState, true);
         }
         private void CancelButtonOnClick()
         {
@@ -245,7 +245,7 @@ namespace XLMultiMapVote.UI
             }
             else
             {
-                Main.multiMapVote.CancelVote(true);
+                Main.voteController.CancelVote(true);
             }
 
             GameStateMachine.Instance.RequestPlayState();
