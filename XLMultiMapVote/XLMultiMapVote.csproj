@@ -142,12 +142,12 @@
   <ItemGroup>
     <Compile Include="XLMultiMapVote.Map\MapChangeManager.cs" />
     <Compile Include="XLMultiMapVote.Patches\MultiplayerGameModePopupPatch.cs" />
+    <Compile Include="XLMultiMapVote.Patches\LeaveRoomPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnPlayerEnteredRoomPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnJoinedRoomPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnEnableMenuPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\ShowObjectivesListPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\OnMasterClientSwitchedPatch.cs" />
-    <Compile Include="XLMultiMapVote.Patches\OnLeftRoomPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
     <Compile Include="XLMultiMapVote.State\PopUpState.cs" />
     <Compile Include="XLMultiMapVote.UI\Components\DisableNavigationOnFocus.cs" />

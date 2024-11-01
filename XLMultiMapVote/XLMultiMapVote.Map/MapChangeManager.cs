@@ -73,6 +73,7 @@ namespace XLMultiMapVote.Map
                 NetworkPlayerUtil.ForPlayer(newPlayer, player => player.ShowMessage(Labels.voteStartedMessage));
             }
         }
+        /*
         public override void OnLeftRoom()
         {
             if (MapHelper.isVoteInProgress)
@@ -89,6 +90,7 @@ namespace XLMultiMapVote.Map
                 }
             }
         }
+        */
         public override void OnMasterClientSwitched(Player newMasterClient)
         {
             if (MapHelper.isVoteInProgress && PhotonNetwork.InRoom || PhotonNetwork.CurrentRoom != null)
