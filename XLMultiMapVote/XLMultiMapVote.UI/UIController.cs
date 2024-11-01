@@ -78,7 +78,7 @@ namespace XLMultiMapVote.UI
 
                 mapVoteUIobj.SetActive(false);
 
-                Main.multiMapVote.voteState = mapVoteUIobj.AddComponent<VoteState>();
+                Main.voteController.voteState = mapVoteUIobj.AddComponent<VoteState>();
 
                 GetUIComponents();
                 AddUIComponents();
@@ -246,7 +246,7 @@ namespace XLMultiMapVote.UI
                 MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.addMapError, 2.0f);
                 return;
             }
-            Main.multiMapVote.AddMapToOptions(dropDownSelection);
+            Main.voteController.AddMapToOptions(dropDownSelection);
             CreateMapListLabel(dropDownSelection);
         }
 
@@ -257,7 +257,7 @@ namespace XLMultiMapVote.UI
 
             if (clearpopUpOptions)
             {
-                Main.multiMapVote.ClearPopUpOptions();
+                Main.voteController.ClearPopUpOptions();
             }
         }
         private void ExitButton()
@@ -268,13 +268,13 @@ namespace XLMultiMapVote.UI
         private void VoteButton()
         {
             if (uiDropDownList.options.Count <= 0
-                || Main.multiMapVote.popUpOptions.Length <= 0
+                || Main.voteController.popUpOptions.Length <= 0
                 || !MultiplayerManager.Instance.IsMasterClient)
             {
                 return;
             }             
 
-            Main.multiMapVote.QueueVote();
+            Main.voteController.QueueVote();
             ClearMapList(false);
             GameStateMachine.Instance.RequestPlayState();
         }

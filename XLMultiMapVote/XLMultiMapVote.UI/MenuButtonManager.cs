@@ -48,8 +48,7 @@ namespace XLMultiMapVote.UI
             //var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options
             //.LastOrDefault(go => go.buttonGO.GetComponent<MenuButton>());
 
-            var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options
-                .ElementAtOrDefault(7);
+            var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options.ElementAtOrDefault(7);
 
             return firstActiveGO?.buttonGO;
         }
@@ -90,7 +89,7 @@ namespace XLMultiMapVote.UI
                 if (customMenuButton == null)
                 {
                     GameObject newButton = Instantiate(menuButtonPrefab, menuButtonPrefab.transform.parent);
-                    newButton.transform.SetSiblingIndex(menuButtonPrefab.gameObject.transform.GetSiblingIndex() - 1); // adds new button one place below button prefab
+                    newButton.transform.SetSiblingIndex(menuButtonPrefab.gameObject.transform.GetSiblingIndex() - 1); // adds new button above button prefab
                     //newButton.transform.SetAsFirstSibling();
                     //newButton.transform.SetAsLastSibling();
                     newButton.name = Labels.menuButtonLabel;
@@ -196,27 +195,27 @@ namespace XLMultiMapVote.UI
             }
 
         }
-        
+        private void DestroyButton(MenuButton button, MultiplayerMainMenu.ButtonVisibilityDef buttonvisability)
+        {
+            button.gameObject.SetActive(false);
+            button.onClick.RemoveAllListeners();
+            MultiplayerManager.Instance.menuController.mainMenu.options.Remove(buttonvisability);
+            Destroy(button.gameObject);
+        }
         public void DestroyButtons()
         {
             try
             {
                 if (customMenuButton != null)
                 {
-                    customMenuButton.gameObject.SetActive(false);
-                    customMenuButton.onClick.RemoveAllListeners();
-                    Destroy(customMenuButton.gameObject);
-                    MultiplayerManager.Instance.menuController.mainMenu.options.Remove(menuButtonVisibility);
+                    DestroyButton(customMenuButton, menuButtonVisibility);
                     menuButtonVisibility = null;
                     customMenuButton = null;
                 }
 
                 if (cancelVoteButton != null)
                 {
-                    cancelVoteButton.gameObject.SetActive(false);
-                    cancelVoteButton.onClick.RemoveAllListeners();
-                    MultiplayerManager.Instance.menuController.mainMenu.options.Remove(cancelButtonVisibility);
-                    Destroy(cancelVoteButton.gameObject);
+                    DestroyButton(cancelVoteButton, cancelButtonVisibility);
                     cancelButtonVisibility = null;
                     cancelVoteButton = null;
                 }
@@ -228,7 +227,7 @@ namespace XLMultiMapVote.UI
         }
         private void MenuButtonOnClick()
         {
-            GameStateMachine.Instance.RequestTransitionTo(Main.multiMapVote.voteState, true);
+            GameStateMachine.Instance.RequestTransitionTo(Main.voteController.voteState, true);
         }
         private void CancelButtonOnClick()
         {
@@ -241,12 +240,16 @@ namespace XLMultiMapVote.UI
             if (!PhotonNetwork.IsMasterClient)
             {
                 //Main.multiMapVote.CancelVote(false);
-                AccessTools.Method(typeof(MultiplayerGameModePopup), "TimeOut").Invoke(MultiplayerManager.Instance.gameModePopup, null);
+                //AccessTools.Method(typeof(MultiplayerGameModePopup), "TimeOut").Invoke(MultiplayerManager.Instance.gameModePopup, null);
+                PopupUtil.TimeoutPopup();
+                ControlsHelper.EnableActiveControls(true);
             }
             else
             {
-                Main.multiMapVote.CancelVote(true);
+                Main.voteController.CancelVote(true);
             }
+
+            GameStateMachine.Instance.RequestPlayState();
         }
     }
 }

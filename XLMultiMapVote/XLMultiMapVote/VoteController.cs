@@ -11,12 +11,13 @@ using XLMultiMapVote.State;
 using HarmonyLib;
 using MapEditor;
 using Photon.Pun;
+using Photon.Realtime;
 
 namespace XLMultiMapVote
 {
-    public class XLMultiMapVote : MonoBehaviour
+    public class VoteController : MonoBehaviour
     {
-        private delegate void PlayerAction(NetworkPlayerController player);
+        //private delegate void PlayerAction(NetworkPlayerController player);
 
         public Action<int> popUpCallBack;
 
@@ -32,7 +33,6 @@ namespace XLMultiMapVote
       
         public void StartMapChangeRoutines()
         {
-            // Start the ChangeMap coroutine and store the reference
             if (changeMapCoroutine == null)
             {
                 changeMapCoroutine = StartCoroutine(ChangeMap());
@@ -40,7 +40,6 @@ namespace XLMultiMapVote
                 //MessageSystem.QueueMessage(MessageDisplayData.Type.Success, "Change Map Started", 1.5f);
             }
 
-            // Start the UpdateVoteList coroutine and store the reference
             if (updateVoteListCoroutine == null)
             {
                 updateVoteListCoroutine = StartCoroutine(UpdateVoteList());
@@ -50,7 +49,6 @@ namespace XLMultiMapVote
         }
         public void StopMapChangeRoutines()
         {
-            // Stop ChangeMap if it's running
             if (changeMapCoroutine != null)
             {
                 StopCoroutine(changeMapCoroutine);
@@ -59,7 +57,6 @@ namespace XLMultiMapVote
                 //MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, "Change Map Stopped", 1.5f);
             }
 
-            // Stop UpdateVoteList if it's running
             if (updateVoteListCoroutine != null)
             {
                 StopCoroutine(updateVoteListCoroutine);
@@ -82,11 +79,11 @@ namespace XLMultiMapVote
             //Main.mapChangeManager.SendMapChangeEvent(true);
             Main.mapChangeManager.SendVoteInProgressEvent(true);
 
-            ShowPlayerPopUp(Labels.popUpMessage, true, Main.settings.popUpTime);
-            ShowMessage(Labels.voteStartedMessage, 3.5f);
-            StartCountdown(Main.settings.popUpTime);
+            ShowPlayerPopUpForAll(Labels.popUpMessage, true, Main.settings.popUpTime);
+            ShowMessageForAll(Labels.voteStartedMessage, 3.5f);
+            StartCountdownForAll(Main.settings.popUpTime);
 
-            StartMapChangeRoutines(); // start routines after pop ups for things are not null
+            StartMapChangeRoutines(); // start routines after pop ups not null
         }
         public IEnumerator ChangeMap()
         {
@@ -102,7 +99,7 @@ namespace XLMultiMapVote
                     if (!string.IsNullOrEmpty(votedMap) && mapInfo != null)
                     {
                         MapHelper.SetNextLevel(mapInfo);
-                        ShowMessage(Labels.voteCompleteMessage + votedMap, 1.5f);
+                        ShowMessageForAll(Labels.voteCompleteMessage + votedMap, 1.5f);
 
                         //LevelManager.Instance.LoadLevel(mapInfo);
                         //LevelManager.Instance.PlayLevel(MapHelper.nextLevelInfo);
@@ -159,22 +156,17 @@ namespace XLMultiMapVote
         
         private void CancelMapChangeOverNetwork()
         {
-            ShowPlayerPopUp(Labels.voteCancelError, false, 1f);
-            ShowMessage(Labels.voteCancelError, 3.0f);
-            StopCountdown();
-            ShowVoteList(Array.Empty<Objective>());
+            ShowPlayerPopUpForAll(Labels.voteCancelError, false, 1f);
+            ShowMessageForAll(Labels.voteCancelError, 3.0f);
+            StopCountdownForAll();
+            ShowVoteListForAll(Array.Empty<Objective>());
         }
         private void CancelMapChangeForSelf()
         {
             ClearPopUpOptions();
             StopMapChangeRoutines();
-
             HideUI();
-
-            if (!InputController.Instance.controlsActive) // OnDisable is not being called on gameModePopup, This is Temp fix for frozen player controls
-            {
-                InputController.Instance.controlsActive = true;
-            }
+            ControlsHelper.EnableActiveControls(true);
 
             //MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"Voting cancelled", 1.5f); // remove later
         }
@@ -182,52 +174,41 @@ namespace XLMultiMapVote
         {
             ObjectiveListController.Instance.Hide();
             CountdownUI.Instance.StopCountdown();
-            MultiplayerManager.Instance.gameModePopup.gameObject.SetActive(false);
+            //MultiplayerManager.Instance.gameModePopup.gameObject.SetActive(false);
+            PopupUtil.TimeoutPopup();
         }
-        private void ForEachPlayer(PlayerAction action)
+       
+        public void StartCountdownForAll(float time)
         {
-            foreach (KeyValuePair<int, NetworkPlayerController> entry in MultiplayerManager.Instance.networkPlayers)
-            {
-                NetworkPlayerController player = entry.Value;
-                if (player)
-                {
-                    action(player);
-                }
-            }
+            NetworkPlayerUtil.ForEachPlayer(player => player.ShowCountdown(time));
         }
-        public void StartCountdown(float time)
+        public void StopCountdownForAll()
         {
-            ForEachPlayer(player => player.ShowCountdown(time));
-        }
-        public void StopCountdown()
-        {
-            ForEachPlayer(player => player.ShowCountdown(0.1f));
+            NetworkPlayerUtil.ForEachPlayer(player => player.ShowCountdown(0.1f));
         }
 
-        public void ShowMessage(string message, float time)
+        public void ShowMessageForAll(string message, float time)
         {
-            ForEachPlayer(player => player.ShowMessage(message, time));
+            NetworkPlayerUtil.ForEachPlayer(player => player.ShowMessage(message, time));
         }
-
-        public void ShowVoteList(Objective[] votelist)
+        public void ShowVoteListForAll(Objective[] votelist)
         {
-            ForEachPlayer(player => player.ShowObjectivesList(votelist));
+            NetworkPlayerUtil.ForEachPlayer(player => player.ShowObjectivesList(votelist));
         }
-        public void ShowPlayerPopUp(string message, bool pauseGame, float time)
+        public void ShowPlayerPopUpForAll(string message, bool pauseGame, float time)
         {
             HandlePopUpCallBack(); // initializes the call back and records the players answer.
 
             voteIndex = new Dictionary<int, int>(); // Re-initialize to make sure it's clean every time
             PopulateVoteIndex();
 
-            ForEachPlayer(player => player.ShowPopup(message, popUpOptions, popUpCallBack, pauseGame, time));
+            NetworkPlayerUtil.ForEachPlayer(player => player.ShowPopup(message, popUpOptions, popUpCallBack, pauseGame, time));
         }
         private void HandlePopUpCallBack()
         {
             popUpCallBack = (optionIndex) => {
                 //Handle the selected option here
                 //Main.Logger.Log($"{GetOptionName(optionIndex)} Selected");
-                //MessageSystem.QueueMessage(MessageDisplayData.Type.Info, $"option {optionIndex} Selected", 2.5f);
                 LogPlayerChoice(optionIndex);
             };
         }
@@ -317,12 +298,12 @@ namespace XLMultiMapVote
             }
 
             // Handle case that there is more than one winner
-            ShowMessage(Labels.tiedMapMessage, 2.5f);
+            ShowMessageForAll(Labels.tiedMapMessage, 2.5f);
             return MapHelper.ChooseMapOnTie(voteIndex, popUpOptions);
         }
         private IEnumerator UpdateVoteList()
         {
-            float countdown = Traverse.Create(CountdownUI.Instance).Field("durationLeft").GetValue<float>();
+            float countdown = CountdownUtil.countdownDuration;
 
             while (countdown > 0.0f)
             {
@@ -331,13 +312,13 @@ namespace XLMultiMapVote
                 Objective[] votelist = ConvertToVoteList(GetVoteList());
                 if (votelist == null)
                 {
-                    ShowVoteList(Array.Empty<Objective>());
+                    ShowVoteListForAll(Array.Empty<Objective>());
                     yield return null;
                 }
                 else
                 {
-                    ShowVoteList(votelist);
-                    yield return null; // Allows the loop to be more responsive
+                    ShowVoteListForAll(votelist);
+                    yield return null;
                 }
             }
             yield return null;

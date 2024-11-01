@@ -2,9 +2,9 @@
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
-using System.Threading.Tasks;
 using UnityEngine;
 using XLMultiMapVote.Data;
+using XLMultiMapVote.Utils;
 
 namespace XLMultiMapVote.Map
 {
@@ -18,10 +18,10 @@ namespace XLMultiMapVote.Map
         }
         private void Start()
         {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                SetRoomProperties(false);  // Initialize to false on Master Client
-            }
+            //if (PhotonNetwork.IsMasterClient)
+            //{
+            //    SetRoomProperties(false);  // Initialize to false on Master Client
+            //}
         }
         private void OnDestroy()
         {
@@ -40,7 +40,7 @@ namespace XLMultiMapVote.Map
 
                 if (MapHelper.HasMapChanged() && MapHelper.hasMapChangedByVote)
                 {
-                    Main.multiMapVote.StopMapChangeRoutines();
+                    Main.voteController.StopMapChangeRoutines();
 
                     PlayerController.Instance.respawn.ForceRespawn();
 
@@ -65,33 +65,43 @@ namespace XLMultiMapVote.Map
                 Main.Logger.Log("[OnJoinedRoom] Joined room. Fetching current map changing state...");
             }
         }
+        public override void OnPlayerEnteredRoom(Player newPlayer)
+        {
+            if (PhotonNetwork.IsMasterClient && MapHelper.isVoteInProgress)
+            {
+                NetworkPlayerUtil.ForPlayer(newPlayer, player => player.ShowCountdown(CountdownUtil.countdownDuration));
+                NetworkPlayerUtil.ForPlayer(newPlayer, player => player.ShowMessage(Labels.voteStartedMessage));
+            }
+        }
+        /*
         public override void OnLeftRoom()
         {
             if (MapHelper.isVoteInProgress)
             {
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    Main.multiMapVote.CancelVote(true);
+                    Main.voteController.CancelVote(true);
                     Main.Logger.Log($"[OnLeftRoom] Vote cancelled over Network");
                 }
                 else
                 {
-                    Main.multiMapVote.CancelVote(false);
+                    Main.voteController.CancelVote(false);
                     Main.Logger.Log($"[OnLeftRoom] Vote cancelled locally");
                 }
             }
         }
+        */
         public override void OnMasterClientSwitched(Player newMasterClient)
         {
             if (MapHelper.isVoteInProgress && PhotonNetwork.InRoom || PhotonNetwork.CurrentRoom != null)
             {
                 if (newMasterClient.IsLocal)
                 {
-                    Main.multiMapVote.CancelVote(true);
+                    Main.voteController.CancelVote(true);
                 }
                 else
                 {
-                    Main.multiMapVote.CancelVote(false);
+                    Main.voteController.CancelVote(false);
                 }
                 Main.Logger.Log($"[OnMasterClientSwitched] new MasterClient : {newMasterClient.ActorNumber} : {newMasterClient.NickName}");
             }    
@@ -113,10 +123,7 @@ namespace XLMultiMapVote.Map
             if (PhotonNetwork.IsMasterClient)
             {
                 // Create a hashtable to hold the room property
-                ExitGames.Client.Photon.Hashtable roomProperties = new ExitGames.Client.Photon.Hashtable
-            {
-                { IsVoteInProgress,isVoteInProgress }
-            };
+                ExitGames.Client.Photon.Hashtable roomProperties = new ExitGames.Client.Photon.Hashtable{ { IsVoteInProgress,isVoteInProgress } };
 
                 // Set the custom property for the room
                 PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);

@@ -1,51 +1,35 @@
 ﻿using HarmonyLib;
-using MapEditor;
 using System;
+using GameManagement;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.Events;
-using XLMultiMapVote.Data;
+using XLMultiMapVote.State;
 
 namespace XLMultiMapVote.UI
 {
+    
     public class PopupMenuManager : MonoBehaviour
     {
-        MultiplayerGameModePopup popupMenu;
+        GameState popUpState;
+
         RectTransform popupOptionsRect;
 
+        public MultiplayerGameModePopup popupUI
+        {
+            get
+            {
+                return MultiplayerManager.Instance.gameModePopup;
+            }
+        }
         private void Awake()
         {
-            popupMenu = GetPopupMenu();
-            popupOptionsRect = GetPopupOptionsRect();
         }
         private void Start()
         {
+            popUpState = popupUI.gameObject.AddComponent<PopUpState>();
+
+            popupOptionsRect = GetPopupOptionsRect();
             SetPopUpOptionsRectSize(0, 720);
-        }
-        private MultiplayerGameModePopup GetPopupMenu()
-        {
-            MultiplayerGameModePopup menu = null;
-            try
-            {
-                menu = MultiplayerManager.Instance.gameModePopup;
-                return menu;
-            }
-            catch (Exception ex)
-            {
-                Main.Logger.Error($"Error Finding popupMenu - {ex.Message}");
-                return null;
-            }
-            finally
-            {
-                if (menu != null)
-                {
-                    Main.Logger.Log("popupMenu has been found");
-                }
-                else
-                {
-                    Main.Logger.Error("menuButtonPrefab Not Found");
-                }
-            }
         }
         private RectTransform GetPopupOptionsRect() 
         {
@@ -71,8 +55,7 @@ namespace XLMultiMapVote.UI
                     Main.Logger.Error("PopupOptionsRect Not Found");
                 }
             }
-        }
-       
+        }    
         private void SetPopUpOptionsRectSize(float x, float y)
         {
             if (popupOptionsRect == null)
@@ -80,5 +63,6 @@ namespace XLMultiMapVote.UI
 
             popupOptionsRect.sizeDelta = new Vector2(x, y);
         }
+
     }
 }
