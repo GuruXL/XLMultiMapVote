@@ -159,6 +159,7 @@
     <Compile Include="XLMultiMapVote.Map\MapHelper.cs" />
     <Compile Include="XLMultiMapVote.UI\Components\SelectableSounds.cs" />
     <Compile Include="XLMultiMapVote.Utils\ControlsHelper.cs" />
+    <Compile Include="XLMultiMapVote.Utils\PopupUtil.cs" />
     <Compile Include="XLMultiMapVote.Utils\CountdownUtil.cs" />
     <Compile Include="XLMultiMapVote.Utils\NetworkPlayerUtil.cs" />
     <Compile Include="XLMultiMapVote.Utils\ResourceExtractor.cs" />

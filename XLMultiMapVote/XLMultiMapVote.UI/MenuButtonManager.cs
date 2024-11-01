@@ -240,7 +240,8 @@ namespace XLMultiMapVote.UI
             if (!PhotonNetwork.IsMasterClient)
             {
                 //Main.multiMapVote.CancelVote(false);
-                AccessTools.Method(typeof(MultiplayerGameModePopup), "TimeOut").Invoke(MultiplayerManager.Instance.gameModePopup, null);
+                //AccessTools.Method(typeof(MultiplayerGameModePopup), "TimeOut").Invoke(MultiplayerManager.Instance.gameModePopup, null);
+                PopupUtil.TimeoutPopup();
                 ControlsHelper.EnableActiveControls(true);
             }
             else

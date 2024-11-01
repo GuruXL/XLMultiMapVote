@@ -175,7 +175,7 @@ namespace XLMultiMapVote
             ObjectiveListController.Instance.Hide();
             CountdownUI.Instance.StopCountdown();
             //MultiplayerManager.Instance.gameModePopup.gameObject.SetActive(false);
-            AccessTools.Method(typeof(MultiplayerGameModePopup), "TimeOut").Invoke(MultiplayerManager.Instance.gameModePopup, null);
+            PopupUtil.TimeoutPopup();
         }
        
         public void StartCountdownForAll(float time)
