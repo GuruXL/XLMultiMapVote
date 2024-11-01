@@ -195,27 +195,27 @@ namespace XLMultiMapVote.UI
             }
 
         }
-        
+        private void DestroyButton(MenuButton button, MultiplayerMainMenu.ButtonVisibilityDef buttonvisability)
+        {
+            button.gameObject.SetActive(false);
+            button.onClick.RemoveAllListeners();
+            MultiplayerManager.Instance.menuController.mainMenu.options.Remove(buttonvisability);
+            Destroy(button.gameObject);
+        }
         public void DestroyButtons()
         {
             try
             {
                 if (customMenuButton != null)
                 {
-                    customMenuButton.gameObject.SetActive(false);
-                    customMenuButton.onClick.RemoveAllListeners();
-                    Destroy(customMenuButton.gameObject);
-                    MultiplayerManager.Instance.menuController.mainMenu.options.Remove(menuButtonVisibility);
+                    DestroyButton(customMenuButton, menuButtonVisibility);
                     menuButtonVisibility = null;
                     customMenuButton = null;
                 }
 
                 if (cancelVoteButton != null)
                 {
-                    cancelVoteButton.gameObject.SetActive(false);
-                    cancelVoteButton.onClick.RemoveAllListeners();
-                    MultiplayerManager.Instance.menuController.mainMenu.options.Remove(cancelButtonVisibility);
-                    Destroy(cancelVoteButton.gameObject);
+                    DestroyButton(cancelVoteButton, cancelButtonVisibility);
                     cancelButtonVisibility = null;
                     cancelVoteButton = null;
                 }
