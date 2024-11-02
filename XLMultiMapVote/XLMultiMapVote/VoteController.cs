@@ -12,6 +12,7 @@ using HarmonyLib;
 using MapEditor;
 using Photon.Pun;
 using Photon.Realtime;
+using static RootMotion.FinalIK.InteractionObject;
 
 namespace XLMultiMapVote
 {
@@ -19,18 +20,29 @@ namespace XLMultiMapVote
     {
         //private delegate void PlayerAction(NetworkPlayerController player);
 
-        public Action<int> popUpCallBack;
+        private Action<int> popUpCallBack;
 
         //public string[] popUpOptions = new string[] { "Option 0", "Option 1", "Option 2", "Option 3", };
         public string[] popUpOptions = new string[] { };
 
-        public Dictionary<int, int> voteIndex = new Dictionary<int, int>();
+        private Dictionary<int, int> voteIndex = new Dictionary<int, int>();
 
-        public VoteState voteState;
+        public VoteState voteState { get; private set; }
 
         private Coroutine changeMapCoroutine;
         private Coroutine updateVoteListCoroutine;
-      
+
+        public void AddVoteState(GameObject obj)
+        {
+            if (voteState == null)
+            {
+                voteState = obj.GetComponent<VoteState>();
+            }
+            else
+            {
+                Main.Logger.Log("[AddVoteState] VoteState Already Exists");
+            }
+        }
         public void StartMapChangeRoutines()
         {
             if (changeMapCoroutine == null)
@@ -85,7 +97,7 @@ namespace XLMultiMapVote
 
             StartMapChangeRoutines(); // start routines after pop ups not null
         }
-        public IEnumerator ChangeMap()
+        private IEnumerator ChangeMap()
         {
             yield return new WaitForSecondsRealtime(Main.settings.popUpTime);
 
@@ -156,8 +168,9 @@ namespace XLMultiMapVote
         
         private void CancelMapChangeOverNetwork()
         {
-            ShowPlayerPopUpForAll(Labels.voteCancelError, false, 1f);
-            ShowMessageForAll(Labels.voteCancelError, 3.0f);
+            //ShowPlayerPopUpForAll(Labels.voteCancelError, false, 1f);
+            StopPopUpForAll(Labels.voteCancelError);
+            ShowMessageForAll(Labels.voteCancelError, 2.5f);
             StopCountdownForAll();
             ShowVoteListForAll(Array.Empty<Objective>());
         }
@@ -170,7 +183,7 @@ namespace XLMultiMapVote
 
             //MessageSystem.QueueMessage(MessageDisplayData.Type.Error, $"Voting cancelled", 1.5f); // remove later
         }
-        public void HideUI()
+        private void HideUI()
         {
             ObjectiveListController.Instance.Hide();
             CountdownUI.Instance.StopCountdown();
@@ -178,31 +191,34 @@ namespace XLMultiMapVote
             PopupUtil.TimeoutPopup();
         }
        
-        public void StartCountdownForAll(float time)
+        private void StartCountdownForAll(float time)
         {
             NetworkPlayerUtil.ForEachPlayer(player => player.ShowCountdown(time));
         }
-        public void StopCountdownForAll()
+        private void StopCountdownForAll()
         {
             NetworkPlayerUtil.ForEachPlayer(player => player.ShowCountdown(0.1f));
         }
 
-        public void ShowMessageForAll(string message, float time)
+        private void ShowMessageForAll(string message, float time)
         {
             NetworkPlayerUtil.ForEachPlayer(player => player.ShowMessage(message, time));
         }
-        public void ShowVoteListForAll(Objective[] votelist)
+        private void ShowVoteListForAll(Objective[] votelist)
         {
             NetworkPlayerUtil.ForEachPlayer(player => player.ShowObjectivesList(votelist));
         }
-        public void ShowPlayerPopUpForAll(string message, bool pauseGame, float time)
+        private void ShowPlayerPopUpForAll(string message, bool pauseGame, float time)
         {
             HandlePopUpCallBack(); // initializes the call back and records the players answer.
-
             voteIndex = new Dictionary<int, int>(); // Re-initialize to make sure it's clean every time
             PopulateVoteIndex();
 
             NetworkPlayerUtil.ForEachPlayer(player => player.ShowPopup(message, popUpOptions, popUpCallBack, pauseGame, time));
+        }
+        private void StopPopUpForAll(string message)
+        {
+            NetworkPlayerUtil.ForEachPlayer(player => player.ShowPopup(message, null, null, false, 1));
         }
         private void HandlePopUpCallBack()
         {
@@ -219,22 +235,6 @@ namespace XLMultiMapVote
                 voteIndex[optionIndex]++;
             }
         }
-
-        /* GetOptionName() not needed anymore
-        public string GetOptionName(int index)
-        {
-            // Check if the index is within the bounds of the popUpOptions array
-            if (index >= 0 && index < popUpOptions.Length)
-            {
-                return popUpOptions[index]; // Return the matching option
-            }
-            else
-            {
-                return "Option";
-            }
-        }
-        */
-
         public void AddMapToOptions(string selectedMap)
         {
             if (string.IsNullOrEmpty(selectedMap))
@@ -333,7 +333,7 @@ namespace XLMultiMapVote
                 voteIndex[i] = 0; // Initialize all vote counts to 0
             }
         }
-        public string[] GetVoteList()
+        private string[] GetVoteList()
         {
             if(voteIndex != null && voteIndex.Count > 0)
             {

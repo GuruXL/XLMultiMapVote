@@ -10,11 +10,22 @@ namespace XLMultiMapVote.UI
     
     public class PopupMenuManager : MonoBehaviour
     {
-        GameState popUpState;
+        //public GameState popUpState;
 
-        RectTransform popupOptionsRect;
+        private bool _isPopUpActive = false;
+        public bool isPopUpActive
+        {
+            get { return _isPopUpActive; }
+            private set { _isPopUpActive = value; }
+        }     
+        public void Set_isPopUpActive(bool status)
+        {
+            _isPopUpActive = status;
+        }
 
-        public MultiplayerGameModePopup popupUI
+        private RectTransform popupOptionsRect;
+
+        private MultiplayerGameModePopup popupUI
         {
             get
             {
@@ -26,7 +37,7 @@ namespace XLMultiMapVote.UI
         }
         private void Start()
         {
-            popUpState = popupUI.gameObject.AddComponent<PopUpState>();
+            //popUpState = popupUI.gameObject.AddComponent<PopUpState>();
 
             popupOptionsRect = GetPopupOptionsRect();
             SetPopUpOptionsRectSize(0, 720);

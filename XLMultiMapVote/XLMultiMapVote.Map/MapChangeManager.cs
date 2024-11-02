@@ -1,4 +1,5 @@
 ﻿using ExitGames.Client.Photon;
+using GameManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
@@ -15,13 +16,6 @@ namespace XLMultiMapVote.Map
         private void Awake()
         {
             LevelManager.Instance.OnLevelChanged += HandleLevelChanged;
-        }
-        private void Start()
-        {
-            //if (PhotonNetwork.IsMasterClient)
-            //{
-            //    SetRoomProperties(false);  // Initialize to false on Master Client
-            //}
         }
         private void OnDestroy()
         {
@@ -73,27 +67,10 @@ namespace XLMultiMapVote.Map
                 NetworkPlayerUtil.ForPlayer(newPlayer, player => player.ShowMessage(Labels.voteStartedMessage));
             }
         }
-        /*
-        public override void OnLeftRoom()
-        {
-            if (MapHelper.isVoteInProgress)
-            {
-                if (PhotonNetwork.IsMasterClient)
-                {
-                    Main.voteController.CancelVote(true);
-                    Main.Logger.Log($"[OnLeftRoom] Vote cancelled over Network");
-                }
-                else
-                {
-                    Main.voteController.CancelVote(false);
-                    Main.Logger.Log($"[OnLeftRoom] Vote cancelled locally");
-                }
-            }
-        }
-        */
+
         public override void OnMasterClientSwitched(Player newMasterClient)
         {
-            if (MapHelper.isVoteInProgress && PhotonNetwork.InRoom || PhotonNetwork.CurrentRoom != null)
+            if (MapHelper.isVoteInProgress && (PhotonNetwork.InRoom || PhotonNetwork.CurrentRoom != null))
             {
                 if (newMasterClient.IsLocal)
                 {
@@ -103,8 +80,8 @@ namespace XLMultiMapVote.Map
                 {
                     Main.voteController.CancelVote(false);
                 }
-                Main.Logger.Log($"[OnMasterClientSwitched] new MasterClient : {newMasterClient.ActorNumber} : {newMasterClient.NickName}");
-            }    
+            }
+            Main.Logger.Log($"[OnMasterClientSwitched] new MasterClient : {newMasterClient.ActorNumber} : {newMasterClient.NickName}");
         }
         public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
         {

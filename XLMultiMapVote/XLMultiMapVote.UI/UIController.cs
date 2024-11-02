@@ -71,14 +71,10 @@ namespace XLMultiMapVote.UI
 
                 mapVoteUIobj = Instantiate(AssetLoader.MapVoteUIPrefab);
                 mapVoteUIobj.transform.SetParent(Main.ScriptManager.transform, false);
-                //mapVoteUIobj.transform.SetParent(MultiplayerManager.Instance.menuController.transform, false);
-                //mapVoteUIobj.transform.SetParent(CountdownUI.Instance.transform.parent, false);
-
-                //EventSystem.current.SetSelectedGameObject(null);
-
                 mapVoteUIobj.SetActive(false);
 
-                Main.voteController.voteState = mapVoteUIobj.AddComponent<VoteState>();
+                //Main.voteController.voteState = mapVoteUIobj.AddComponent<VoteState>();
+                Main.voteController.AddVoteState(mapVoteUIobj);
 
                 GetUIComponents();
                 AddUIComponents();

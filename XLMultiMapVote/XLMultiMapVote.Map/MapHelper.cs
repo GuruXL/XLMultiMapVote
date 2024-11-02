@@ -6,7 +6,7 @@ namespace XLMultiMapVote.Map
 {
     public static class MapHelper
     {
-        public static List<LevelInfo> combinedMapList = new List<LevelInfo>();
+        private static List<LevelInfo> combinedMapList = new List<LevelInfo>();
         public static string[] mapNames { get; private set; }
         public static LevelInfo currentLevelInfo { get; private set; }
         public static LevelInfo nextLevelInfo { get; private set; }

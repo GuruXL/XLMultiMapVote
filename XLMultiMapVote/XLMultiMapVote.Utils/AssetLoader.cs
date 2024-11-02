@@ -8,9 +8,9 @@ namespace XLMultiMapVote.Utils
 {
     public static class AssetLoader
     {
-        public static AssetBundle assetBundle;
+        private static AssetBundle assetBundle;
 
-        public static GameObject MapVoteUIPrefab;
+        public static GameObject MapVoteUIPrefab { get; private set; }
 
         public static bool assetsLoaded { get; private set; } = false;
 

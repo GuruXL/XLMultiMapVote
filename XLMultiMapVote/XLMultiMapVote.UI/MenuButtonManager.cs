@@ -18,8 +18,8 @@ namespace XLMultiMapVote.UI
         //public bool isVoteUIactive { get; private set; } = false;
 
         private GameObject menuButtonPrefab;
-        public MenuButton customMenuButton;
-        public MenuButton cancelVoteButton;
+        private MenuButton customMenuButton;
+        private MenuButton cancelVoteButton;
         private MultiplayerMainMenu.ButtonVisibilityDef menuButtonVisibility;
         private MultiplayerMainMenu.ButtonVisibilityDef cancelButtonVisibility;
 
@@ -40,7 +40,7 @@ namespace XLMultiMapVote.UI
             CreateCancelVoteButton();
             //SetUpCanvasScaler();
         }
-        public GameObject GetMultiplayerMenuButton()
+        private GameObject GetMultiplayerMenuButton()
         {
             //var firstActiveGO = MultiplayerManager.Instance.menuController.mainMenu.options
             //.FirstOrDefault(go => go.buttonGO.GetComponent<MenuButton>());
@@ -202,7 +202,7 @@ namespace XLMultiMapVote.UI
             MultiplayerManager.Instance.menuController.mainMenu.options.Remove(buttonvisability);
             Destroy(button.gameObject);
         }
-        public void DestroyButtons()
+        private void DestroyButtons()
         {
             try
             {

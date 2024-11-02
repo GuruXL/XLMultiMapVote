@@ -22,13 +22,18 @@ namespace XLMultiMapVote.Utils
                 }
             }
         }
-
         public static void ForPlayer(Player photonPlayer, Action<NetworkPlayerController> action)
         {
             foreach (KeyValuePair<int, NetworkPlayerController> entry in MultiplayerManager.Instance.networkPlayers)
             {
                 NetworkPlayerController player = entry.Value;
-                if (player.PhotonPlayer == photonPlayer)
+
+                //if (player.PhotonPlayer == photonPlayer)
+                //{
+                //    action(player);
+                //}
+
+                if (photonPlayer.UserId == player.PhotonPlayer.UserId)
                 {
                     action(player);
                 }
