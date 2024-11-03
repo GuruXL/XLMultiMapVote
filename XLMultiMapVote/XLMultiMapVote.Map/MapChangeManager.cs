@@ -2,10 +2,12 @@
 using GameManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using UnityEngine;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
+using XLMultiMapVote.Network;
 
 namespace XLMultiMapVote.Map
 {
@@ -55,33 +57,54 @@ namespace XLMultiMapVote.Map
             }
             else
             {
-                GetMapChangingStateFromRoom(); // Fetch the current map-changing state from room properties
-                Main.Logger.Log("[OnJoinedRoom] Joined room. Fetching current map changing state...");
+                GetMapChangingStateFromRoom();
+                Main.Logger.Log("[OnJoinedRoom] Joined room. Fetching current voting progress state...");
             }
+           
         }
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             if (PhotonNetwork.IsMasterClient && MapHelper.isVoteInProgress)
             {
-                NetworkPlayerUtil.ForPlayer(newPlayer, player => player.ShowCountdown(CountdownUtil.countdownDuration));
-                NetworkPlayerUtil.ForPlayer(newPlayer, player => player.ShowMessage(Labels.voteStartedMessage));
+                if (NetworkPlayerHelper.IsVotingEnabled(newPlayer))
+                {
+                    StartCoroutine(DelayedSend(newPlayer));
+                    Main.Logger.Log($"[OnPlayerEnteredRoom] {newPlayer.ActorNumber} : {newPlayer.NickName} entered room while vote in progress.");
+                }
+                else
+                {
+                    Main.Logger.Log($"[OnPlayerEnteredRoom] {newPlayer.ActorNumber} : {newPlayer.NickName} does not have voting enabled.");
+                }
             }
+        }
+        private IEnumerator DelayedSend(Player newPlayer)
+        {
+            yield return NetworkPlayerHelper.WaitForPhotonNetwork();
+            yield return new WaitForSecondsRealtime(1);
+
+            if (NetworkPlayerHelper.IsVotingEnabled(newPlayer))
+            {
+                NetworkPlayerController player = NetworkPlayerHelper.GetNetworkPlayerController(newPlayer);
+                player.ShowCountdown(CountdownUtil.countdownDuration);
+                player.ShowMessage(Labels.voteStartedMessage);
+            }
+            yield return null;
         }
 
         public override void OnMasterClientSwitched(Player newMasterClient)
         {
-            if (MapHelper.isVoteInProgress && (PhotonNetwork.InRoom || PhotonNetwork.CurrentRoom != null))
+            bool isLocal = newMasterClient.IsLocal;
+
+            if (isLocal)
             {
-                if (newMasterClient.IsLocal)
-                {
-                    Main.voteController.CancelVote(true);
-                }
-                else
-                {
-                    Main.voteController.CancelVote(false);
-                }
+                MapHelper.SetCurrentLevel(LevelManager.Instance.currentLevel, true);
             }
-            Main.Logger.Log($"[OnMasterClientSwitched] new MasterClient : {newMasterClient.ActorNumber} : {newMasterClient.NickName}");
+
+            if (MapHelper.isVoteInProgress)
+            {
+                Main.voteController.CancelVote(isLocal);
+                Main.Logger.Log($"[OnMasterClientSwitched] Vote Cancelled Over Network :{isLocal}");
+            }
         }
         public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
         {
@@ -108,7 +131,7 @@ namespace XLMultiMapVote.Map
             }
             else
             {
-                Main.Logger.Warning("[SetRoomProperties] Only the Master Client can set the map changing state.");
+                Main.Logger.Warning("[SetRoomProperties] Only the MasterClient can set the map changing state.");
             }
         }
         private void GetMapChangingStateFromRoom()

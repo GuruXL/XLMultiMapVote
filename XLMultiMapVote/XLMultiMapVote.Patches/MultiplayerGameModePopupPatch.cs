@@ -5,6 +5,7 @@ using Photon.Pun;
 using ModIO.UI;
 using XLMultiMapVote.Map;
 using GameManagement;
+using XLMultiMapVote.Utils;
 
 namespace XLMultiMapVote.Patches
 {
@@ -19,8 +20,7 @@ namespace XLMultiMapVote.Patches
         {
             if (MapHelper.isVoteInProgress)
             {
-                bool isPaused = Traverse.Create(MultiplayerManager.Instance.gameModePopup).Field("pause").GetValue<bool>();
-                if (isPaused && GameStateMachine.Instance.CurrentState is ReplayState)
+                if (PopupUtil.isPaused() && GameStateMachine.Instance.CurrentState is ReplayState)
                 {
                     Time.timeScale = 1f;
                     // Skip the original Update method
@@ -40,36 +40,32 @@ namespace XLMultiMapVote.Patches
     [HarmonyPatch("OnEnable")]
     public static class OnEnableGameModePopupPatch
     {
-        public static void Prefix()
+        public static void Postfix()
         {
             Main.popupMenuManager.Set_isPopUpActive(true);
 
-            if (MapHelper.isVoteInProgress)
+            if (PopupUtil.isPaused())
             {
                 GameStateMachine.Instance.allowRespawn = false;
                 GameStateMachine.Instance.allowPinMovement = false;
+            }
 
-                //GameStateMachine.Instance.RequestTransitionTo(Main.popupMenuManager.popUpState);
-                Main.Logger.Log($"[OnEnableGameModePopupPatch] triggered");
-            }       
+            //Main.Logger.Log($"[OnEnableGameModePopupPatch] triggered");
         }
     }
     [HarmonyPatch(typeof(MultiplayerGameModePopup))]
     [HarmonyPatch("OnDisable")]
     public static class OnDisableGameModePopupPatch
     {
-        public static void Prefix()
+        public static void Postfix()
         {
             Main.popupMenuManager.Set_isPopUpActive(false);
 
-            if (MapHelper.isVoteInProgress)
-            {
-                GameStateMachine.Instance.allowRespawn = true;
-                GameStateMachine.Instance.allowPinMovement = true;
+            GameStateMachine.Instance.allowRespawn = true;
+            GameStateMachine.Instance.allowPinMovement = true;
+            ControlsHelper.EnableActiveControls(true);
 
-                //GameStateMachine.Instance.RequestPreviousState();
-                Main.Logger.Log($"[OnDisableGameModePopupPatch] triggered");
-            }
+            //Main.Logger.Log($"[OnDisableGameModePopupPatch] triggered");
         }
     }
 }

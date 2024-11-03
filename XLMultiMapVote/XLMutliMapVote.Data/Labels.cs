@@ -21,7 +21,7 @@
         public const string cancelButtonLabel = "Cancel Vote";
 
         // Error
-        public const string invalidMapError = "Cannot Change Maps: Map is Invalid";
+        public const string invalidMapError = "Can not Change Maps: Map is Invalid";
 
         public const string hostError = "Voting can only be set up by the lobby host";
 
@@ -31,9 +31,11 @@
 
         public const string voteCancelError = "Voting has been cancelled - the map will no longer change"; 
 
-        public const string mapListEmptyError = "Cannot queue vote - Map list must have a minimum of 2 maps.";
+        public const string mapListEmptyError = "Can not queue vote - Map list must have a minimum of 2 maps.";
 
-        public const string addMapError = "Cannot add current map to voting list";
+        public const string addMapError = "Can not add current map to voting list";
+
+        public const string disableVoteAsHostError = "Can not disable voting when host of the room";
 
     }
 }

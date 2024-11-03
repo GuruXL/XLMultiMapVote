@@ -8,6 +8,7 @@ using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
 using XLMultiMapVote.UI;
 using XLMultiMapVote.Map;
+using XLMultiMapVote.Network;
 using Photon.Pun;
 using System;
 using Object = UnityEngine.Object;
@@ -25,6 +26,7 @@ namespace XLMultiMapVote
         public static GameObject ScriptManager;
         public static VoteController voteController;
         public static MapChangeManager mapChangeManager;
+        public static NetworkPlayerManager networkPlayerManager;
         public static MenuButtonManager menuButtonManager;
         public static PopupMenuManager popupMenuManager;
         public static UIController uiController;
@@ -54,16 +56,44 @@ namespace XLMultiMapVote
             if (!PhotonNetwork.IsConnected && !PhotonNetwork.InRoom)
                 return;
 
-            GUILayout.BeginVertical("Box"); // Main Box
+            //GUILayout.BeginVertical("Box"); // Main Box
 
             GUILayout.BeginHorizontal();
+            //settings.isVotingEnabled = GUILayout.Toggle(settings.isVotingEnabled, "Enable Voting", GUILayout.Width(128));
+            RGUI.BeginBackgroundColor(GUIExtensions.ColorSwitch(settings.isVotingEnabled, Color.cyan, Color.white));
+            if (GUILayout.Button(GUIExtensions.LabelSwitch("Voting Enabled", Color.white, "Voting Disabled", Color.gray, settings.isVotingEnabled), RGUIStyle.button, GUILayout.Width(128)))
+            {     
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    if (settings.isVotingEnabled == false)
+                    {
+                        settings.isVotingEnabled = true;
+                        NetworkPlayerHelper.SetPlayerProperties(settings.isVotingEnabled);
+                    }
+                    MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.disableVoteAsHostError, 2.0f);
+                    return;
+                }
+                else
+                {
+                    settings.isVotingEnabled = !settings.isVotingEnabled;
+                    NetworkPlayerHelper.SetPlayerProperties(settings.isVotingEnabled);
+                }
+            }
+            RGUI.EndBackgroundColor();
             RGUI.BeginBackgroundColor(Color.white);
-            settings.disableVotingPopup = GUILayout.Toggle(settings.disableVotingPopup, "Disable Voting Popup", GUILayout.Width(186));
+            if (GUILayout.Button("Cancel Vote", RGUIStyle.button, GUILayout.Width(128)))
+            {
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    voteController.CancelVote(true);
+                }
+                else
+                {
+                    voteController.CancelVote(false);
+                }
+            }
             RGUI.EndBackgroundColor();
             GUILayout.EndHorizontal();
-
-
-            GUILayout.EndVertical(); // main Box
 
             /*
             GUILayout.Space(6);
@@ -137,7 +167,6 @@ namespace XLMultiMapVote
             GUILayout.EndVertical(); // main Box
             */
         }
-
         private static void OnSaveGUI(UnityModManager.ModEntry modEntry)
         {
             settings.Save(modEntry);
@@ -159,6 +188,7 @@ namespace XLMultiMapVote
                     ScriptManager = new GameObject("XLMultiMapVote");
                     voteController = ScriptManager.AddComponent<VoteController>();
                     mapChangeManager = ScriptManager.AddComponent<MapChangeManager>();
+                    networkPlayerManager = ScriptManager.AddComponent<NetworkPlayerManager>();
                     menuButtonManager = ScriptManager.AddComponent<MenuButtonManager>();
                     popupMenuManager = ScriptManager.AddComponent<PopupMenuManager>();
                     uiController = ScriptManager.AddComponent<UIController>();

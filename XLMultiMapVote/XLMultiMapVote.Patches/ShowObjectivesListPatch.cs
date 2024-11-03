@@ -10,7 +10,7 @@ namespace XLMultiMapVote.Patches
     {
         public static bool Prefix()
         {
-            if (!PhotonNetwork.IsMasterClient && Main.settings.disableVotingForSelf) // no cheat detection for objective list. added so user can disable all UI.
+            if (!PhotonNetwork.IsMasterClient && !Main.settings.isVotingEnabled) // no cheat detection for objective list. added so user can disable all UI.
             {
                 return false; // Skip Original Method
             }

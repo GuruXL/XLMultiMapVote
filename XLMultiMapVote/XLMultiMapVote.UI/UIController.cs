@@ -334,9 +334,9 @@ namespace XLMultiMapVote.UI
             }
 
             // Update the pop-up time if it has changed
-            if (Main.settings.popUpTime != value)
+            if (PopupUtil.popUpTime != value)
             {
-                Main.settings.popUpTime = value;
+                PopupUtil.popUpTime = value;
             }
         }
 

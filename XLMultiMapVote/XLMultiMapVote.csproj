@@ -97,6 +97,7 @@
     <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.ResourceManager, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\Unity.TextMeshPro.dll</HintPath>
@@ -141,8 +142,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="XLMultiMapVote.Map\MapChangeManager.cs" />
+    <Compile Include="XLMultiMapVote.Network\NetworkPlayerManager.cs" />
     <Compile Include="XLMultiMapVote.Patches\MultiplayerGameModePopupPatch.cs" />
-    <Compile Include="XLMultiMapVote.Patches\LeaveRoomPatch.cs" />
+    <Compile Include="XLMultiMapVote.Patches\ForceLeaveRoomPatch.cs" />
+    <Compile Include="XLMultiMapVote.Patches\ExitGamePatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\ShowObjectivesListPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
     <Compile Include="XLMultiMapVote.UI\Components\DisableNavigationOnFocus.cs" />
@@ -150,13 +153,14 @@
     <Compile Include="XLMultiMapVote.UI\MenuButtonManager.cs" />
     <Compile Include="XLMultiMapVote.UI\Components\ScrollRectAutoScroll.cs" />
     <Compile Include="XLMultiMapVote.UI\UIController.cs" />
+    <Compile Include="XLMultiMapVote.UI\GUIExtensions.cs" />
     <Compile Include="XLMultiMapVote.Utils\AssetLoader.cs" />
     <Compile Include="XLMultiMapVote.Map\MapHelper.cs" />
     <Compile Include="XLMultiMapVote.UI\Components\SelectableSounds.cs" />
     <Compile Include="XLMultiMapVote.Utils\ControlsHelper.cs" />
     <Compile Include="XLMultiMapVote.Utils\PopupUtil.cs" />
     <Compile Include="XLMultiMapVote.Utils\CountdownUtil.cs" />
-    <Compile Include="XLMultiMapVote.Utils\NetworkPlayerUtil.cs" />
+    <Compile Include="XLMultiMapVote.Network\NetworkPlayerHelper.cs" />
     <Compile Include="XLMultiMapVote.Utils\ResourceExtractor.cs" />
     <Compile Include="XLMultiMapVote\Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

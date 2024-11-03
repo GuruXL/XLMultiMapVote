@@ -8,18 +8,14 @@ using XLMultiMapVote.Data;
 using XLMultiMapVote.Utils;
 using XLMultiMapVote.Map;
 using XLMultiMapVote.State;
+using XLMultiMapVote.Network;
 using HarmonyLib;
-using MapEditor;
 using Photon.Pun;
-using Photon.Realtime;
-using static RootMotion.FinalIK.InteractionObject;
 
 namespace XLMultiMapVote
 {
     public class VoteController : MonoBehaviour
     {
-        //private delegate void PlayerAction(NetworkPlayerController player);
-
         private Action<int> popUpCallBack;
 
         //public string[] popUpOptions = new string[] { "Option 0", "Option 1", "Option 2", "Option 3", };
@@ -36,7 +32,7 @@ namespace XLMultiMapVote
         {
             if (voteState == null)
             {
-                voteState = obj.GetComponent<VoteState>();
+                voteState = obj.AddComponent<VoteState>();
             }
             else
             {
@@ -91,15 +87,15 @@ namespace XLMultiMapVote
             //Main.mapChangeManager.SendMapChangeEvent(true);
             Main.mapChangeManager.SendVoteInProgressEvent(true);
 
-            ShowPlayerPopUpForAll(Labels.popUpMessage, true, Main.settings.popUpTime);
+            ShowPopUpForAll(Labels.popUpMessage, true, PopupUtil.popUpTime);
             ShowMessageForAll(Labels.voteStartedMessage, 3.5f);
-            StartCountdownForAll(Main.settings.popUpTime);
+            StartCountdownForAll(PopupUtil.popUpTime);
 
             StartMapChangeRoutines(); // start routines after pop ups not null
         }
         private IEnumerator ChangeMap()
         {
-            yield return new WaitForSecondsRealtime(Main.settings.popUpTime);
+            yield return new WaitForSecondsRealtime(PopupUtil.popUpTime);
 
             try
             {
@@ -168,8 +164,7 @@ namespace XLMultiMapVote
         
         private void CancelMapChangeOverNetwork()
         {
-            //ShowPlayerPopUpForAll(Labels.voteCancelError, false, 1f);
-            StopPopUpForAll(Labels.voteCancelError);
+            ShowPopUpForAll(Labels.voteCancelError, false, 0.1f);
             ShowMessageForAll(Labels.voteCancelError, 2.5f);
             StopCountdownForAll();
             ShowVoteListForAll(Array.Empty<Objective>());
@@ -193,32 +188,28 @@ namespace XLMultiMapVote
        
         private void StartCountdownForAll(float time)
         {
-            NetworkPlayerUtil.ForEachPlayer(player => player.ShowCountdown(time));
+            NetworkPlayerHelper.ForEachPlayerWithMod(player => player.ShowCountdown(time));
         }
         private void StopCountdownForAll()
         {
-            NetworkPlayerUtil.ForEachPlayer(player => player.ShowCountdown(0.1f));
+            NetworkPlayerHelper.ForEachPlayerWithMod(player => player.ShowCountdown(0.1f));
         }
 
         private void ShowMessageForAll(string message, float time)
         {
-            NetworkPlayerUtil.ForEachPlayer(player => player.ShowMessage(message, time));
+            NetworkPlayerHelper.ForEachPlayerWithMod(player => player.ShowMessage(message, time));
         }
         private void ShowVoteListForAll(Objective[] votelist)
         {
-            NetworkPlayerUtil.ForEachPlayer(player => player.ShowObjectivesList(votelist));
+            NetworkPlayerHelper.ForEachPlayerWithMod(player => player.ShowObjectivesList(votelist));
         }
-        private void ShowPlayerPopUpForAll(string message, bool pauseGame, float time)
+        private void ShowPopUpForAll(string message, bool pauseGame, float time)
         {
             HandlePopUpCallBack(); // initializes the call back and records the players answer.
             voteIndex = new Dictionary<int, int>(); // Re-initialize to make sure it's clean every time
             PopulateVoteIndex();
 
-            NetworkPlayerUtil.ForEachPlayer(player => player.ShowPopup(message, popUpOptions, popUpCallBack, pauseGame, time));
-        }
-        private void StopPopUpForAll(string message)
-        {
-            NetworkPlayerUtil.ForEachPlayer(player => player.ShowPopup(message, null, null, false, 1));
+            NetworkPlayerHelper.ForEachPlayerWithMod(player => player.ShowPopup(message, popUpOptions, popUpCallBack, pauseGame, time));
         }
         private void HandlePopUpCallBack()
         {
@@ -305,9 +296,9 @@ namespace XLMultiMapVote
         {
             float countdown = CountdownUtil.countdownDuration;
 
-            while (countdown > 0.0f)
+            while (countdown > 0f)
             {
-                yield return new WaitForSecondsRealtime(0.5f);
+                yield return new WaitForSecondsRealtime(1.0f);
 
                 Objective[] votelist = ConvertToVoteList(GetVoteList());
                 if (votelist == null)

@@ -12,7 +12,7 @@ namespace XLMultiMapVote.Utils
                 return;
             }
 
-            if (!InputController.Instance.controlsActive) // OnDisable is not being called on gameModePopup, This is Temp fix for frozen player controls
+            if (!InputController.Instance.controlsActive) // This is Temp fix for frozen player controls
             {
                 InputController.Instance.controlsActive = enabled;
             }

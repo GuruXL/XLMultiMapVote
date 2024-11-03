@@ -2,7 +2,7 @@
     "Id": "XLMultiMapVote",
     "DisplayName": "XL Multiplayer Map Vote",
     "Author": "Guru",
-    "Version": "0.2.8",
+    "Version": "0.3.0",
     "ManagerVersion": "0.22.5.0",
     "Requirements": [],
     "LoadAfter": [],

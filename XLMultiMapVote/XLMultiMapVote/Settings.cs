@@ -1,29 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Photon.Pun;
+using System;
 using UnityModManagerNet;
-using XLMultiMapVote.Data;
-using RapidGUI;
+using XLMultiMapVote.Network;
 
 namespace XLMultiMapVote
 {
     [Serializable]
-    public class Settings : UnityModManager.ModSettings, IDrawable
+    public class Settings : UnityModManager.ModSettings
     {
-        public bool disableVotingPopup = false;
-        //public bool allowPopUps = true;
-
-        public float popUpTime = 30.0f;
-
-        public string selectedMap = Labels.addMapText;
-
-        public string filterString = "";
-
-        public void OnChange()
-        {
-            throw new NotImplementedException();
-        }
+        public bool isVotingEnabled = true;
+       
         public override void Save(UnityModManager.ModEntry modEntry)
         {
             Save(this, modEntry);

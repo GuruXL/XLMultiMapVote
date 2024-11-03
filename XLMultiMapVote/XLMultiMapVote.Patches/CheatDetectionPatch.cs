@@ -17,7 +17,7 @@ namespace XLMultiMapVote.Patches
                 return true;
             }
 
-            if (type == CheatDetection.ControlType.Popup && !Main.settings.disableVotingPopup)
+            if (type == CheatDetection.ControlType.Popup && Main.settings.isVotingEnabled)
             {
                 __result = true; // Bypass Detection
                 return false;    // Skip the original method
