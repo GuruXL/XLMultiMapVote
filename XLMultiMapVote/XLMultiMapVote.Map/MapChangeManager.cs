@@ -39,11 +39,9 @@ namespace XLMultiMapVote.Map
                     Main.voteController.StopMapChangeRoutines();
 
                     PlayerController.Instance.respawn.ForceRespawn();
-
-                    //MessageSystem.QueueMessage(MessageDisplayData.Type.Success, Labels.mapChangedMessage + levelInfo.name, 2.0f);
-                    Main.Logger.Log(Labels.mapChangedMessage + levelInfo.name);
-
                     MapHelper.Set_hasMapChangedByVote(false);
+
+                    Main.Logger.Log(Labels.mapChangedMessage + levelInfo.name);
                 }
             }
         }
@@ -53,12 +51,12 @@ namespace XLMultiMapVote.Map
             {
                 MapHelper.SetCurrentLevel(LevelManager.Instance.currentLevel, true);
                 SendVoteInProgressEvent(false);
-                Main.Logger.Log("[OnJoinedRoom] Joined room. Settings current level info as MasterClient");
+                //Main.Logger.Log("[OnJoinedRoom] Joined room. Settings current level info as MasterClient");
             }
             else
             {
-                GetMapChangingStateFromRoom();
-                Main.Logger.Log("[OnJoinedRoom] Joined room. Fetching current voting progress state...");
+                GetVoteInProgressFromRoom();
+                //Main.Logger.Log("[OnJoinedRoom] Joined room. Fetching current voting progress state...");
             }
            
         }
@@ -69,11 +67,11 @@ namespace XLMultiMapVote.Map
                 if (NetworkPlayerHelper.IsVotingEnabled(newPlayer))
                 {
                     StartCoroutine(DelayedSend(newPlayer));
-                    Main.Logger.Log($"[OnPlayerEnteredRoom] {newPlayer.ActorNumber} : {newPlayer.NickName} entered room while vote in progress.");
+                    //Main.Logger.Log($"[OnPlayerEnteredRoom] {newPlayer.ActorNumber} : {newPlayer.NickName} entered room while vote in progress.");
                 }
                 else
                 {
-                    Main.Logger.Log($"[OnPlayerEnteredRoom] {newPlayer.ActorNumber} : {newPlayer.NickName} does not have voting enabled.");
+                    //Main.Logger.Log($"[OnPlayerEnteredRoom] {newPlayer.ActorNumber} : {newPlayer.NickName} does not have voting enabled.");
                 }
             }
         }
@@ -103,7 +101,7 @@ namespace XLMultiMapVote.Map
             if (MapHelper.isVoteInProgress)
             {
                 Main.voteController.CancelVote(isLocal);
-                Main.Logger.Log($"[OnMasterClientSwitched] Vote Cancelled Over Network :{isLocal}");
+                //Main.Logger.Log($"[OnMasterClientSwitched] Vote Cancelled Over Network :{isLocal}");
             }
         }
         public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
@@ -114,7 +112,7 @@ namespace XLMultiMapVote.Map
                 {
                     bool isVoteInProgress = (bool)propertiesThatChanged[IsVoteInProgress];
                     MapHelper.Set_isVoteInProgress(isVoteInProgress);
-                    Main.Logger.Log($"[OnRoomPropertiesUpdate] Room property '{IsVoteInProgress}' updated to: {MapHelper.isVoteInProgress}");
+                    //Main.Logger.Log($"[OnRoomPropertiesUpdate] Room property '{IsVoteInProgress}' updated to: {MapHelper.isVoteInProgress}");
                 }
             }      
         }
@@ -122,10 +120,8 @@ namespace XLMultiMapVote.Map
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                // Create a hashtable to hold the room property
                 ExitGames.Client.Photon.Hashtable roomProperties = new ExitGames.Client.Photon.Hashtable{ { IsVoteInProgress,isVoteInProgress } };
 
-                // Set the custom property for the room
                 PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
                 Main.Logger.Log($"[SetRoomProperties] Room property '{IsVoteInProgress}' set to: {MapHelper.isVoteInProgress}");
             }
@@ -134,17 +130,17 @@ namespace XLMultiMapVote.Map
                 Main.Logger.Warning("[SetRoomProperties] Only the MasterClient can set the map changing state.");
             }
         }
-        private void GetMapChangingStateFromRoom()
+        private void GetVoteInProgressFromRoom()
         {
             if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(IsVoteInProgress))
             {
                 bool isVoteInProgress = (bool)PhotonNetwork.CurrentRoom.CustomProperties[IsVoteInProgress];
                 MapHelper.Set_isVoteInProgress(isVoteInProgress);
-                Main.Logger.Log($"[GetMapChangingStateFromRoom] Read isMapChanging from room properties: {MapHelper.isVoteInProgress}");
+                Main.Logger.Log($"[GetMapChangingStateFromRoom] Room property isVoteInProgress: {MapHelper.isVoteInProgress}");
             }
             else
             {
-                Main.Logger.Warning("[GetMapChangingStateFromRoom] Room properties do not contain 'isMapChanging'.");
+                Main.Logger.Warning("[GetMapChangingStateFromRoom] Room properties do not contain 'isVoteInProgress'.");
             }
         }
         public void SendVoteInProgressEvent(bool isVoteInProgress)

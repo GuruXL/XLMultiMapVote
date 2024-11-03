@@ -35,7 +35,7 @@ namespace XLMultiMapVote.UI.Components
             {
                 nav.mode = Navigation.Mode.None;
                 inputField.navigation = nav;
-                isNavigationDisabled = true; // Mark that navigation is now disabled
+                isNavigationDisabled = true; 
             }
         }
         private void EnableNav()
@@ -43,36 +43,36 @@ namespace XLMultiMapVote.UI.Components
             Navigation nav = inputField.navigation;
             if (nav.mode == Navigation.Mode.None)
             {
-                nav.mode = Navigation.Mode.Explicit; // Or whatever mode suits the UI layout
+                nav.mode = Navigation.Mode.Explicit;
                 inputField.navigation = nav;
-                isNavigationDisabled = false; // Mark that navigation is now enabled
+                isNavigationDisabled = false;
             }
         }
         public void OnSelect(BaseEventData eventData)
         {
             if (inputField.text.Length == 0)
             {
-                EnableNav(); // Ensure navigation is enabled when selected if the field is empty
+                EnableNav();
             }
         }
         public void OnDeselect(BaseEventData eventData)
         {
-            EnableNav(); // Enable navigation when deselected
+            EnableNav();
         }
 
         public void OnCancel(BaseEventData eventData)
         {
-            EnableNav(); // Enable navigation if canceled
+            EnableNav();
         }
         public void OnSubmit(BaseEventData eventData)
         {
-            EnableNav(); // Enable navigation if submitted
+            EnableNav();
         }
         public void OnPointerClick(PointerEventData eventData)
         {
             if (inputField.text.Length == 0)
             {
-                EnableNav(); // Make sure navigation is enabled if the user clicks and the input is empty
+                EnableNav();
             }
         }
     }

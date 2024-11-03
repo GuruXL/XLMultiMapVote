@@ -83,15 +83,13 @@ namespace XLMultiMapVote
             }
             if (MapHelper.isVoteInProgress) return; // return if map change is already queued
 
-            //MapHelper.Set_isMapChanging(true);
-            //Main.mapChangeManager.SendMapChangeEvent(true);
             Main.mapChangeManager.SendVoteInProgressEvent(true);
 
             ShowPopUpForAll(Labels.popUpMessage, true, PopupUtil.popUpTime);
             ShowMessageForAll(Labels.voteStartedMessage, 3.5f);
             StartCountdownForAll(PopupUtil.popUpTime);
 
-            StartMapChangeRoutines(); // start routines after pop ups not null
+            StartMapChangeRoutines(); // start routines after popups are not null
         }
         private IEnumerator ChangeMap()
         {
@@ -132,8 +130,6 @@ namespace XLMultiMapVote
             }
             finally
             {
-                //MapHelper.Set_isMapChanging(false);
-                //Main.mapChangeManager.SendMapChangeEvent(false);
                 Main.mapChangeManager.SendVoteInProgressEvent(false);
             }
 

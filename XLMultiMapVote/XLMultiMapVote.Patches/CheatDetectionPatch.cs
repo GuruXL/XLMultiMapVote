@@ -24,7 +24,7 @@ namespace XLMultiMapVote.Patches
             }
             else
             {
-                // allow the cheat detection to run as normal
+                // run as normal
                 return true;
             }
         }

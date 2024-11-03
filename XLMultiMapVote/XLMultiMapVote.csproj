@@ -145,8 +145,6 @@
     <Compile Include="XLMultiMapVote.Network\NetworkPlayerManager.cs" />
     <Compile Include="XLMultiMapVote.Patches\MultiplayerGameModePopupPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\ForceLeaveRoomPatch.cs" />
-    <Compile Include="XLMultiMapVote.Patches\ExitGamePatch.cs" />
-    <Compile Include="XLMultiMapVote.Patches\ShowObjectivesListPatch.cs" />
     <Compile Include="XLMultiMapVote.Patches\CheatDetectionPatch.cs" />
     <Compile Include="XLMultiMapVote.UI\Components\DisableNavigationOnFocus.cs" />
     <Compile Include="XLMultiMapVote.UI\PopupMenuManager.cs" />

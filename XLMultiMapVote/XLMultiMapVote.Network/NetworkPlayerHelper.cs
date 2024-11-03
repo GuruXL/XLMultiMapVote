@@ -18,18 +18,18 @@ namespace XLMultiMapVote.Network
             {
                 if (value is bool votingEnabled)
                 {
-                    Main.Logger.Log($"[IsVotingEnabled] Player {player.NickName}: IsVotingEnabled = {votingEnabled}");
+                    //Main.Logger.Log($"[IsVotingEnabled] Player {player.NickName}: IsVotingEnabled = {votingEnabled}");
                     return votingEnabled;
                 }
                 else
                 {
-                    Main.Logger.Log($"[IsVotingEnabled] Player {player.NickName}: IsVotingEnabled property not a Bool value");
+                    //Main.Logger.Log($"[IsVotingEnabled] Player {player.NickName}: IsVotingEnabled property not a Bool value");
                     return false;
                 }            
             }
             else
             {
-                Main.Logger.Log($"[IsVotingEnabled] Player {player.NickName}: IsVotingEnabled property not found.");
+                //Main.Logger.Log($"[IsVotingEnabled] Player {player.NickName}: IsVotingEnabled property not found.");
                 return false;
             }
         }
@@ -40,7 +40,7 @@ namespace XLMultiMapVote.Network
                 { IsVoteEnabled, enabled }
             };
             PhotonNetwork.LocalPlayer.SetCustomProperties(modProperties);
-            Main.Logger.Log($"[SetPlayerProperties] Local Player - IsVotingEnabled Set to :{enabled}.");
+            //Main.Logger.Log($"[SetPlayerProperties] Local Player - IsVotingEnabled Set to :{enabled}.");
         }
         private static void ForEachPlayer(Action<NetworkPlayerController> action)
         {
