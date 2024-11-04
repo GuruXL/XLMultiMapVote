@@ -123,7 +123,7 @@ namespace XLMultiMapVote.Map
                 ExitGames.Client.Photon.Hashtable roomProperties = new ExitGames.Client.Photon.Hashtable{ { IsVoteInProgress,isVoteInProgress } };
 
                 PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
-                Main.Logger.Log($"[SetRoomProperties] Room property '{IsVoteInProgress}' set to: {MapHelper.isVoteInProgress}");
+                //Main.Logger.Log($"[SetRoomProperties] Room property '{IsVoteInProgress}' set to: {MapHelper.isVoteInProgress}");
             }
             else
             {
@@ -136,7 +136,7 @@ namespace XLMultiMapVote.Map
             {
                 bool isVoteInProgress = (bool)PhotonNetwork.CurrentRoom.CustomProperties[IsVoteInProgress];
                 MapHelper.Set_isVoteInProgress(isVoteInProgress);
-                Main.Logger.Log($"[GetMapChangingStateFromRoom] Room property isVoteInProgress: {MapHelper.isVoteInProgress}");
+                //Main.Logger.Log($"[GetMapChangingStateFromRoom] Room property isVoteInProgress: {MapHelper.isVoteInProgress}");
             }
             else
             {
@@ -149,7 +149,7 @@ namespace XLMultiMapVote.Map
             {
                 MapHelper.Set_isVoteInProgress(isVoteInProgress);
                 SetRoomProperties(isVoteInProgress);
-                Main.Logger.Log($"[SendVoteInProgressEvent] isVoteInProgress : {MapHelper.isVoteInProgress}.");
+                //Main.Logger.Log($"[SendVoteInProgressEvent] isVoteInProgress : {MapHelper.isVoteInProgress}.");
             }
         }
     }

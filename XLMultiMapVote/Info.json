@@ -1,8 +1,8 @@
 {
     "Id": "XLMultiMapVote",
-    "DisplayName": "XL Multiplayer Map Vote",
+    "DisplayName": "XL Multiplayer Map Vote Mod",
     "Author": "Guru",
-    "Version": "0.3.0",
+    "Version": "1.0.0",
     "ManagerVersion": "0.22.5.0",
     "Requirements": [],
     "LoadAfter": [],

@@ -209,10 +209,9 @@ namespace XLMultiMapVote
         }
         private void HandlePopUpCallBack()
         {
-            popUpCallBack = (optionIndex) => {
-                //Handle the selected option here
-                //Main.Logger.Log($"{GetOptionName(optionIndex)} Selected");
-                LogPlayerChoice(optionIndex);
+            popUpCallBack = (optionIndex) => 
+            { 
+                LogPlayerChoice(optionIndex); 
             };
         }
         private void LogPlayerChoice(int optionIndex)
