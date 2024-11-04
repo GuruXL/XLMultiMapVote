@@ -65,10 +65,10 @@ namespace XLMultiMapVote
             {     
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    if (settings.isVotingEnabled == false)
+                    if (!settings.isVotingEnabled)
                     {
                         settings.isVotingEnabled = true;
-                        NetworkPlayerHelper.SetPlayerProperties(settings.isVotingEnabled);
+                        NetworkPlayerHelper.SetPlayerProperties(settings.isVotingEnabled);            
                     }
                     MessageSystem.QueueMessage(MessageDisplayData.Type.Warning, Labels.disableVoteAsHostError, 2.0f);
                     return;
@@ -195,6 +195,8 @@ namespace XLMultiMapVote
                     Object.DontDestroyOnLoad(ScriptManager);
 
                     AssetLoader.LoadBundles();
+
+                    EnableVoting(true);
                 }
                 catch (Exception ex)
                 {
@@ -215,6 +217,8 @@ namespace XLMultiMapVote
         {
             try
             {
+                EnableVoting(false);
+
                 harmonyInstance?.UnpatchAll(harmonyInstance.Id);
                 AssetLoader.UnloadAssetBundle();
 
@@ -233,6 +237,23 @@ namespace XLMultiMapVote
             }
 
             return true;
+        }
+        private static void EnableVoting(bool enabled)
+        {
+            settings.isVotingEnabled = enabled;
+            NetworkPlayerHelper.SetPlayerProperties(enabled);
+
+            if (!enabled && MapHelper.isVoteInProgress)
+            {
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    voteController.CancelVote(true);
+                }
+                else
+                {
+                    voteController.CancelVote(false);
+                }
+            }
         }
         public static UnityModManager.ModEntry.ModLogger Logger => modEntry.Logger;
     }

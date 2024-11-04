@@ -20,6 +20,7 @@ namespace XLMultiMapVote.Patches
                 else
                 {
                     Main.voteController.CancelVote(false);
+                    MapHelper.Set_isVoteInProgress(false);
                     //Main.Logger.Log($"[ForceLeaveRoom] Vote cancelled locally");
                 }
             }

@@ -28,11 +28,11 @@ namespace XLMultiMapVote.Network
         }
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
         {
-            if (changedProps.ContainsKey(NetworkPlayerHelper.IsVoteEnabled))
-            {
-                bool isVotingEnabled = (bool)changedProps[NetworkPlayerHelper.IsVoteEnabled];
-                Main.Logger.Log($"[OnPlayerPropertiesUpdate] Player {targetPlayer.NickName}: IsVotingEnabled updated to {isVotingEnabled}");
-            }
+            //if (changedProps.ContainsKey(NetworkPlayerHelper.IsVoteEnabled))
+            //{
+            //    bool isVotingEnabled = (bool)changedProps[NetworkPlayerHelper.IsVoteEnabled];
+            //    Main.Logger.Log($"[OnPlayerPropertiesUpdate] Player {targetPlayer.NickName}: IsVotingEnabled updated to {isVotingEnabled}");
+            //}
         }
    }
 }

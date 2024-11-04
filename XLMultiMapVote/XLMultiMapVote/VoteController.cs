@@ -147,23 +147,19 @@ namespace XLMultiMapVote
             {
                 CancelMapChangeForSelf();
             }
-
-            if (PhotonNetwork.IsMasterClient)
-            {
-                Main.mapChangeManager.SendVoteInProgressEvent(false);
-            }
-            else
-            {
-                MapHelper.Set_isVoteInProgress(false);
-            }
         }
         
         private void CancelMapChangeOverNetwork()
         {
-            ShowPopUpForAll(Labels.voteCancelError, false, 0.1f);
-            ShowMessageForAll(Labels.voteCancelError, 2.5f);
-            StopCountdownForAll();
-            ShowVoteListForAll(Array.Empty<Objective>());
+            if (PhotonNetwork.IsMasterClient)
+            {
+                ShowPopUpForAll(Labels.voteCancelError, false, 0.1f);
+                ShowMessageForAll(Labels.voteCancelError, 2.5f);
+                StopCountdownForAll();
+                ShowVoteListForAll(Array.Empty<Objective>());
+
+                Main.mapChangeManager.SendVoteInProgressEvent(false);
+            }
         }
         private void CancelMapChangeForSelf()
         {
