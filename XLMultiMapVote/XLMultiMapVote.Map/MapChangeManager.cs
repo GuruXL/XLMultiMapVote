@@ -96,6 +96,11 @@ namespace XLMultiMapVote.Map
             if (isLocal)
             {
                 MapHelper.SetCurrentLevel(LevelManager.Instance.currentLevel, true);
+                if (!Main.settings.isVotingEnabled)
+                {
+                    Main.settings.isVotingEnabled = true;
+                    NetworkPlayerHelper.SetPlayerProperties(true);
+                }
             }
 
             if (MapHelper.isVoteInProgress)
