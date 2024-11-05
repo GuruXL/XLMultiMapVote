@@ -16,7 +16,7 @@
         // UI
         public const string addMapText = "Select Map to Add";
 
-        public const string menuButtonLabel = "Vote for Next Map";
+        public const string menuButtonLabel = "Set Up Map Vote";
 
         public const string cancelButtonLabel = "Cancel Vote";
 
