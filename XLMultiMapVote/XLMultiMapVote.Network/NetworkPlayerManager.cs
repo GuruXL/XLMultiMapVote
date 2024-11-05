@@ -22,7 +22,7 @@ namespace XLMultiMapVote.Network
         }
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
         {
-            if (!PhotonNetwork.IsMasterClient && targetPlayer.IsLocal)
+            if (!PhotonNetwork.IsMasterClient && !targetPlayer.IsLocal)
                 return;
 
             if (!MapHelper.isVoteInProgress)
