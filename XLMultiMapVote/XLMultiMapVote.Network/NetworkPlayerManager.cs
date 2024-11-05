@@ -22,24 +22,21 @@ namespace XLMultiMapVote.Network
         }
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
         {
-            if (!PhotonNetwork.IsMasterClient && !targetPlayer.IsLocal)
+            if (!PhotonNetwork.IsMasterClient && !MapHelper.isVoteInProgress)
                 return;
 
-            if (MapHelper.isVoteInProgress)
+            if (!targetPlayer.IsLocal && changedProps.ContainsKey(NetworkPlayerHelper.IsVoteEnabled))
             {
-                if (changedProps.ContainsKey(NetworkPlayerHelper.IsVoteEnabled))
-                {
-                    bool isVotingEnabled = (bool)changedProps[NetworkPlayerHelper.IsVoteEnabled];
+                bool isVotingEnabled = (bool)changedProps[NetworkPlayerHelper.IsVoteEnabled];
 
-                    if (isVotingEnabled)
-                    {
-                        NetworkPlayerController player = NetworkPlayerHelper.GetNetworkPlayerController(targetPlayer);
-                        player.ShowCountdown(CountdownUtil.countdownDuration);
-                        player.ShowMessage(Labels.voteStartedMessage);
-                    }
-                    //Main.Logger.Log($"[OnPlayerPropertiesUpdate] Player {targetPlayer.NickName}: IsVotingEnabled updated to {isVotingEnabled}");
+                if (isVotingEnabled && CountdownUtil.countdownDuration > 0f)
+                {
+                    NetworkPlayerController player = NetworkPlayerHelper.GetNetworkPlayerController(targetPlayer);
+                    player.ShowCountdown(CountdownUtil.countdownDuration);
+                    player.ShowMessage(Labels.voteStartedMessage);
                 }
-            }        
+                //Main.Logger.Log($"[OnPlayerPropertiesUpdate] Player {targetPlayer.NickName}: IsVotingEnabled updated to {isVotingEnabled}");
+            }
         }
    }
 }
