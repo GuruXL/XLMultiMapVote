@@ -1,14 +1,8 @@
-﻿using ExitGames.Client.Photon;
-using GameManagement;
-using Photon.Pun;
+﻿using Photon.Pun;
 using Photon.Realtime;
-using System;
-using System.Collections;
-using UnityEngine;
 using XLMultiMapVote.Data;
 using XLMultiMapVote.Map;
 using XLMultiMapVote.Utils;
-
 
 namespace XLMultiMapVote.Network
 {
@@ -28,11 +22,24 @@ namespace XLMultiMapVote.Network
         }
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
         {
-            //if (changedProps.ContainsKey(NetworkPlayerHelper.IsVoteEnabled))
-            //{
-            //    bool isVotingEnabled = (bool)changedProps[NetworkPlayerHelper.IsVoteEnabled];
-            //    Main.Logger.Log($"[OnPlayerPropertiesUpdate] Player {targetPlayer.NickName}: IsVotingEnabled updated to {isVotingEnabled}");
-            //}
+            if (!PhotonNetwork.IsMasterClient && targetPlayer.IsLocal)
+                return;
+
+            if (!MapHelper.isVoteInProgress)
+            {
+                if (changedProps.ContainsKey(NetworkPlayerHelper.IsVoteEnabled))
+                {
+                    bool isVotingEnabled = (bool)changedProps[NetworkPlayerHelper.IsVoteEnabled];
+
+                    if (isVotingEnabled)
+                    {
+                        NetworkPlayerController player = NetworkPlayerHelper.GetNetworkPlayerController(targetPlayer);
+                        player.ShowCountdown(CountdownUtil.countdownDuration);
+                        player.ShowMessage(Labels.voteStartedMessage);
+                    }
+                    //Main.Logger.Log($"[OnPlayerPropertiesUpdate] Player {targetPlayer.NickName}: IsVotingEnabled updated to {isVotingEnabled}");
+                }
+            }        
         }
    }
 }

@@ -19,6 +19,10 @@ namespace XLMultiMapVote.Map
         {
             LevelManager.Instance.OnLevelChanged += HandleLevelChanged;
         }
+        private void Start()
+        {
+            GetVoteInProgressFromRoom();
+        }
         private void OnDestroy()
         {
             LevelManager.Instance.OnLevelChanged -= HandleLevelChanged;
@@ -106,6 +110,11 @@ namespace XLMultiMapVote.Map
             if (MapHelper.isVoteInProgress)
             {
                 Main.voteController.CancelVote(isLocal);
+
+                if (!isLocal)
+                {
+                    MapHelper.Set_isVoteInProgress(false);
+                }
                 //Main.Logger.Log($"[OnMasterClientSwitched] Vote Cancelled Over Network :{isLocal}");
             }
         }
@@ -123,21 +132,23 @@ namespace XLMultiMapVote.Map
         }
         private void SetRoomProperties(bool isVoteInProgress)
         {
-            if (PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom != null)
             {
-                ExitGames.Client.Photon.Hashtable roomProperties = new ExitGames.Client.Photon.Hashtable{ { IsVoteInProgress,isVoteInProgress } };
-
+                ExitGames.Client.Photon.Hashtable roomProperties = new ExitGames.Client.Photon.Hashtable
+                { 
+                    { IsVoteInProgress, isVoteInProgress } 
+                };
                 PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
                 //Main.Logger.Log($"[SetRoomProperties] Room property '{IsVoteInProgress}' set to: {MapHelper.isVoteInProgress}");
             }
             else
             {
-                Main.Logger.Warning("[SetRoomProperties] Only the MasterClient can set the map changing state.");
+                Main.Logger.Log("[SetRoomProperties] unable to set custom room properties.");
             }
         }
         private void GetVoteInProgressFromRoom()
         {
-            if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(IsVoteInProgress))
+            if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(IsVoteInProgress))
             {
                 bool isVoteInProgress = (bool)PhotonNetwork.CurrentRoom.CustomProperties[IsVoteInProgress];
                 MapHelper.Set_isVoteInProgress(isVoteInProgress);
@@ -145,7 +156,7 @@ namespace XLMultiMapVote.Map
             }
             else
             {
-                Main.Logger.Warning("[GetMapChangingStateFromRoom] Room properties do not contain 'isVoteInProgress'.");
+                Main.Logger.Log("[GetMapChangingStateFromRoom] unable to get room property 'isVoteInProgress'.");
             }
         }
         public void SendVoteInProgressEvent(bool isVoteInProgress)

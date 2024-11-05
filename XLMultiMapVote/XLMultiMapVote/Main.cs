@@ -15,7 +15,6 @@ using Object = UnityEngine.Object;
 
 namespace XLMultiMapVote
 {
-    [EnableReloading]
     internal static class Main
     {
         public static bool enabled;
@@ -252,6 +251,7 @@ namespace XLMultiMapVote
                 else
                 {
                     voteController.CancelVote(false);
+                    MapHelper.Set_isVoteInProgress(false);
                 }
             }
         }
